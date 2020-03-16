@@ -479,7 +479,7 @@ if 	memory.read_u8(0x02030368)==0xFF and memory.read_u8(0x02030368+0x02)==0 then
 	end
 
 	if memory.read_u8(0x020308B0+0x14C*3)>0 then
-		gui.text(120,165, "E4 Agi: " .. memory.read_u8(0x020308B0+0x8+0x14C*3))
+		gui.text(140,165, "E4 Agi: " .. memory.read_u8(0x020308B0+0x8+0x14C*3))
 		gui.text(240,165, "HP: " .. memory.read_u16_le(0x020308B0+0x14C*3))
 	else
 	end
