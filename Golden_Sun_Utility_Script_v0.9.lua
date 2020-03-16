@@ -384,7 +384,7 @@ while memcount <= 20000 and memory.read_u32_le(mem) == 0 or mem==0x02010000 do
 	memcount = memcount+1
 end
 
-gui.text(70,0,"Nonzero Tile: " .. memcount)
+gui.text(450,460,"Nonzero Tile: " .. memcount)
 gui.text(70,15,"Roll: " .. PercentRoll(RNA(memory.read_u32_le(AD4)),8))
 end
 
@@ -432,7 +432,7 @@ if memory.read_u16_le(0x02000400) ~= 0x1FE and minorhudlock==false and StatusMen
 	magi=memory.read_u8(0x02000500+0x1C+0x14C*3)
 	mlv=memory.read_u8(0x02000500+0x14C*3+0xF)
 	magilv=-magi+(mlv-10)*4+0x2C -- imperfect levels ups discounting randomly rolled stats on new file
-	gui.text(0,225,"Missing Agi I:" .. iagilv .. " G:" .. gagilv .. " V:" .. vagilv .. " M:" .. magilv)
+	gui.text(150,460,"Missing Agi I:" .. iagilv .. " G:" .. gagilv .. " V:" .. vagilv .. " M:" .. magilv)
 end
 
 		-- begin enemy HP/encounter loops
@@ -1295,6 +1295,11 @@ if overlay == true and infight == false then
 	tile = memory.read_u32_le(0x020301B8)
 	tile_value = memory.read_u16_le(tile)
 
+	gui.drawLine(108, 98, 123, 98)
+	gui.drawLine(123, 98, 123, 108)
+	gui.drawLine(123, 108, 108, 108)
+	gui.drawLine(108, 108, 108, 98)
+
 	function compress(S)
 	    R = bit.rshift(memory.read_u32_le(S),16)
 	    R = bit.band(R,0xFF)
@@ -1351,14 +1356,6 @@ if overlay == true and infight == false then
 				E = E+0xC
 			end
 	end
-	
-	if area ~= memory.read_u16_le(0x2000408) and eventtable > 0 and memory.read_u32_le(0x020301B8) > 0x02000000 and memory.read_u16_le(0x2000400)~=0 then
-		eventlist = {}
-		objectlist = {}
-		doorlist = {}
-		interesting_event()
-		area = memory.read_u16_le(0x2000408)
-	end
 
 	function eventcheck(element,tablu)
 	  for _, value in pairs(tablu) do
@@ -1368,7 +1365,15 @@ if overlay == true and infight == false then
 	  end
 	  return false
 	end
-
+		
+	if area ~= memory.read_u16_le(0x2000408) and eventtable > 0 and memory.read_u32_le(0x020301B8) > 0x02000000 and memory.read_u16_le(0x2000400)~=0 then
+		eventlist = {}
+		objectlist = {}
+		doorlist = {}
+		interesting_event()
+		area = memory.read_u16_le(0x2000408)
+	end
+		
 	function color(S)
 			T = tile_height(memory.read_u32_le(memory.read_u32_le(0x020301B8)))
 			U = tile_height(memory.read_u32_le(S))
@@ -1390,14 +1395,13 @@ if overlay == true and infight == false then
 --        else
 --          WorldMapFactor = 1
 --        end
-    if tile ~= 0 then
-	gui.drawLine(108, 98, 123, 98)
-	gui.drawLine(123, 98, 123, 108)
-	gui.drawLine(123, 108, 108, 108)
-	gui.drawLine(108, 108, 108, 98)
 	for i=-4,4 do
 	  for j=-4,4 do
-	    cur_tile = tile+0x200*i+0x4*j
+	    if tile == 0 then
+              cur_tile = 0
+            else
+	      cur_tile = tile+0x200*i+0x4*j
+            end
 	    gui.text(110+j*15,100+i*15, compress(cur_tile), color(cur_tile))
 			if eventcheck(compress(cur_tile),objectlist) == true then
 				gui.drawLine(108+j*15, 98+i*15, 123+j*15, 98+i*15, 0xFFFFFF00)
@@ -1414,9 +1418,8 @@ if overlay == true and infight == false then
 				gui.drawLine(123+j*15, 98+i*15, 123+j*15, 108+i*15, 0xFFFF00FF)
 				gui.drawLine(123+j*15, 108+i*15, 108+j*15, 108+i*15, 0xFFFF00FF)
 				gui.drawLine(108+j*15, 108+i*15, 108+j*15, 98+i*15, 0xFFFF00FF)
-		end
+			end
 	  end
-	end
 	end
 end
 
