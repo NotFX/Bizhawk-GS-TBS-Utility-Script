@@ -1395,10 +1395,12 @@ if overlay == true and infight == false then
 				C = "white"
 			elseif extract_height(T) < extract_height(U) then
 				shade = math.min((extract_height(U) - extract_height(T))/4*255,255)
-				C = { 255, 255-shade, 255-shade}
+				C = 0xFFFF00FF + 256*(255-shade)
+				-- C = { 255, 255-shade, 255-shade}
 			elseif extract_height(T) > extract_height(U) then
 				shade = math.min((extract_height(T) - extract_height(U))/4*255,255)
-				C = { 255-shade, 255, 255}
+				-- C = { 255-shade, 255, 255}
+				C = 0xFF00FFFF + 256*256*(255-shade)
 			end
 			return C
 			end
@@ -1409,26 +1411,24 @@ if overlay == true and infight == false then
 --        end
 	for i=-4,4 do
 	  for j=-4,4 do
---      fix this section - ruadath
 	    gui.text(110+j*15,100+i*15, compress(tile+0x200*i+0x4*j), color(tile+0x200*i+0x4*j))
 			if eventcheck(compress(tile+0x200*i+0x4*j),objectlist) == true then
-				gui.line(108+j*15, 98+i*15, 123+j*15, 98+i*15, "#FFFF00")
-				gui.line(123+j*15, 98+i*15, 123+j*15, 108+i*15, "#FFFF00")
-				gui.line(123+j*15, 108+i*15, 108+j*15, 108+i*15, "#FFFF00")
-				gui.line(108+j*15, 108+i*15, 108+j*15, 98+i*15, "#FFFF00")
+				gui.drawLine(108+j*15, 98+i*15, 123+j*15, 98+i*15, 0xFFFFFF00)
+				gui.drawLine(123+j*15, 98+i*15, 123+j*15, 108+i*15, 0xFFFFFF00)
+				gui.drawLine(123+j*15, 108+i*15, 108+j*15, 108+i*15, 0xFFFFFF00)
+				gui.drawLine(108+j*15, 108+i*15, 108+j*15, 98+i*15, 0xFFFFFF00)
 			elseif eventcheck(compress(tile+0x200*i+0x4*j),doorlist) == true then
-				gui.line(108+j*15, 98+i*15, 123+j*15, 98+i*15, "#00FF00")
-				gui.line(123+j*15, 98+i*15, 123+j*15, 108+i*15, "#00FF00")
-				gui.line(123+j*15, 108+i*15, 108+j*15, 108+i*15, "#00FF00")
-				gui.line(108+j*15, 108+i*15, 108+j*15, 98+i*15, "#00FF00")
+				gui.drawLine(108+j*15, 98+i*15, 123+j*15, 98+i*15, 0xFF00FF00)
+				gui.drawLine(123+j*15, 98+i*15, 123+j*15, 108+i*15, 0xFF00FF00)
+				gui.drawLine(123+j*15, 108+i*15, 108+j*15, 108+i*15, 0xFF00FF00)
+				gui.drawLine(108+j*15, 108+i*15, 108+j*15, 98+i*15, 0xFF00FF00)
 			elseif eventcheck(compress(tile+0x200*i+0x4*j),eventlist) == true then
-				gui.line(108+j*15, 98+i*15, 123+j*15, 98+i*15, "#FF00FF")
-				gui.line(123+j*15, 98+i*15, 123+j*15, 108+i*15, "#FF00FF")
-				gui.line(123+j*15, 108+i*15, 108+j*15, 108+i*15, "#FF00FF")
-				gui.line(108+j*15, 108+i*15, 108+j*15, 98+i*15, "#FF00FF")
+				gui.drawLine(108+j*15, 98+i*15, 123+j*15, 98+i*15, 0xFFFF00FF)
+				gui.drawLine(123+j*15, 98+i*15, 123+j*15, 108+i*15, 0xFFFF00FF)
+				gui.drawLine(123+j*15, 108+i*15, 108+j*15, 108+i*15, 0xFFFF00FF)
+				gui.drawLine(108+j*15, 108+i*15, 108+j*15, 98+i*15, 0xFFFF00FF)
 			end
 	  end
-	end
 end
 
 --This code is for randomising the GRN/BRN by advancing the GRN/BRN a random number of times
