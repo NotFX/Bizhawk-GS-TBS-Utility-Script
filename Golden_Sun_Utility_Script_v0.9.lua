@@ -1417,7 +1417,6 @@ if overlay == true and infight == false then
 	      cur_tile = tile+0x200*i+0x4*j,0
             end
 	    gui.text(110+j*15,100+i*15, compress(cur_tile), color(cur_tile))
-	    gui.text(110+j*15,100+i*15, compress(tile+0x200*i+0x4*j), color(tile+0x200*i+0x4*j))
 			if eventcheck(compress(tile+0x200*i+0x4*j),objectlist) == true then
 				gui.drawLine(108+j*15, 98+i*15, 123+j*15, 98+i*15, 0xFFFFFF00)
 				gui.drawLine(123+j*15, 98+i*15, 123+j*15, 108+i*15, 0xFFFFFF00)
