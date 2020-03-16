@@ -384,7 +384,7 @@ while memcount <= 20000 and memory.read_u32_le(mem) == 0 or mem==0x02010000 do
 	memcount = memcount+1
 end
 
-gui.text(70,0,"Nonzero Tile: " .. memcount)
+gui.text(450,460,"Nonzero Tile: " .. memcount)
 gui.text(70,15,"Roll: " .. PercentRoll(RNA(memory.read_u32_le(AD4)),8))
 end
 
@@ -432,7 +432,7 @@ if memory.read_u16_le(0x02000400) ~= 0x1FE and minorhudlock==false and StatusMen
 	magi=memory.read_u8(0x02000500+0x1C+0x14C*3)
 	mlv=memory.read_u8(0x02000500+0x14C*3+0xF)
 	magilv=-magi+(mlv-10)*4+0x2C -- imperfect levels ups discounting randomly rolled stats on new file
-	gui.text(0,225,"Missing Agi I:" .. iagilv .. " G:" .. gagilv .. " V:" .. vagilv .. " M:" .. magilv)
+	gui.text(150,460,"Missing Agi I:" .. iagilv .. " G:" .. gagilv .. " V:" .. vagilv .. " M:" .. magilv)
 end
 
 		-- begin enemy HP/encounter loops
