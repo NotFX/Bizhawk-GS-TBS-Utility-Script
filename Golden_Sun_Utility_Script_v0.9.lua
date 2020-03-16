@@ -88,7 +88,7 @@ local IvanLevels = {0,32,90,194,350,568,895,1418,2150,3102,4292,5720,7419,9424,1
 local MiaLevels = {0,31,87,188,350,609,997,1540,2273,3226,4341,5657,7197,8999,11107,13594,16529,19992,24078,28899,34395,40660,47802,55944,65226,75715}
 local levelstore = 1
 local statstate = false
-local StatColor = {"#00FF00","#FFFFFF","#FFFFFF","#FFFFFF","#FFFFFF","#FFFFFF"}
+local StatColor = {0xFF00FF00,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF}
 local SelectedStat = 0
 local StatToChange = 0
 local IsaacGoals = {{30,182},{20,80},{13,86},{6,38},{8,86}}
@@ -229,14 +229,14 @@ local tableState = false
        end
 
        function ColorRate(R) -- R = ColorRate1
-             ColorRateS= {255, 0, 0}
+             ColorRateS= 0xFFFF0000
              ColorRateShade = math.floor((22-R)/22*255)
              if ColorRateShade <= 63 then
-               ColorRateS = {255, 4*ColorRateShade, 0}
+               ColorRateS = 0xFFFF0000 + 1024*ColorRateShade
              elseif ColorRateShade <=191 then
-               ColorRateS = {255-255*(ColorRateShade-63)/128-1, 255, 0}
+               ColorRateS = 0xFF00FF00 + 256*256*(255-255*(ColorRateShade-63)/128-1)
              else
-               ColorRateS = {0,255,0}
+               ColorRateS = 0xFF00FF00
              end
            return ColorRateS
          end
@@ -611,10 +611,10 @@ end
         end
         ColorRate1 = memory.read_u32_le(0x02000478)-EncounterRate
         ColorRateShade = 0
-        ColorRate2 = {255,255,255}
+        ColorRate2 = 0xFFFFFFFF
         if ColorRate1 < 0 then
           EncounterRate = memory.read_u32_le(0x02000478)
-          ColorRate2 = {255,255,255}
+          ColorRate2 = 0xFFFFFFFF
           CurrentRate = 0
         else
           if memory.read_u16_le(0x02000400) ~= 2 then -- world map?
@@ -629,20 +629,20 @@ end
             end
           end
           if ColorRate1 >= GoodRateThreshold2 then
-            ColorRate2= {255, 0, 0}
+            ColorRate2= 0xFFFF0000
             EncounterRate = memory.read_u32_le(0x02000478)
             CurrentRate = NormalisedRate(AD6)
             if NormalisedRate(AD6) == "" then
-              ColorRate2= {255, 255, 255}
+              ColorRate2= 0xFFFFFFFF
             end
           else
             ColorRateShade = math.floor((GoodRateThreshold2-ColorRate1)/GoodRateThreshold2*255)
             if ColorRateShade <= 63 then
-              ColorRate2 = {255, 4*ColorRateShade, 0}
+              ColorRate2 = 0xFFFF0000 + 1024*ColorRateShade
             elseif ColorRateShade <=191 then
-              ColorRate2 = {255-255*(ColorRateShade-63)/128-1, 255, 0}
+              ColorRate2 = 0xFF00FF00 + 256*256*(255-255*(ColorRateShade-63)/128-1)
             else
-              ColorRate2 = {0,255,0}
+              ColorRate2 = 0xFF00FF00
             end
             EncounterRate = memory.read_u32_le(0x02000478)
             CurrentRate = NormalisedRate(AD6)
@@ -664,12 +664,12 @@ end
 encounterValue = memory.read_u32_le(0x02000478)
 if encounterValue == 0 and encounterPreviousvalue ~= 0 then
   encounterPreviousvalue = 0
-  encounterColor = {255,255,255}
+  encounterColor = 0xFFFFFFFF
 elseif encounterValue ~= encounterPreviousvalue then
-  encounterColor = {0,255,0}
+  encounterColor = 0xFF00FF00
   encounterPreviousvalue = memory.read_u32_le(0x02000478)
 else
-  encounterColor = {255,255,255}
+  encounterColor = 0xFFFFFFFF
   encounterPreviousvalue = memory.read_u32_le(0x02000478)
 end
 -- if memory.read_u8(0x02030AEC) >= 1 then
