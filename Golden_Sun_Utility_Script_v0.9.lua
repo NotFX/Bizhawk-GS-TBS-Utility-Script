@@ -1365,20 +1365,6 @@ if overlay == true and infight == false then
 			end
 	end
 
-	if area ~= memory.read_u16_le(0x2000408) and eventtable > 0 and memory.read_u32_le(0x020301B8) > 0x02000000 and memory.read_u16_le(0x2000400)~=0 then
-		eventlist = {}
-		objectlist = {}
-		doorlist = {}
-		interesting_event()
-		area = memory.read_u16_le(0x2000408)
-		print("Area " .. area .. " door list: (green)")
-		print(doorlist)
-		print("Area " .. area .. " interaction list: (yellow)")
-		print(objectlist)
-		print("Area " .. area .. " event list: (pink)")
-		print(eventlist)
-	end
-
 	function eventcheck(element,tablu)
 	  for _, value in pairs(tablu) do
 	    if value == element then
