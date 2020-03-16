@@ -1,3 +1,5 @@
+local version = (memory.read_u8(0x080000A0) == 0x4F) and "J" or "U"
+
 local AD1 = 0x0200053a -- Isaac PP
 local AD3 = 0x0200047A -- Next Encounter
 local AD4 = 0x020023A8 -- Battle RN
@@ -310,6 +312,7 @@ local tableState = false
 --60 = 50% dmg to health
 --69 = 10% dmg to PP
 print("Welcome to the Golden Sun Utility Script")
+print("Currently configured for " .. version .. " version")
 print("Commands:")
 print("shift+g: advances the GRN by one")
 print("shift+b: advances the BRN by one")
