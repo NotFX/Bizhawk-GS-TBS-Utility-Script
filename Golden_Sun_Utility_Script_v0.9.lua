@@ -1429,6 +1429,7 @@ if overlay == true and infight == false then
 				gui.drawLine(108+j*15, 108+i*15, 108+j*15, 98+i*15, 0xFFFF00FF)
 			end
 	  end
+	end
 end
 
 --This code is for randomising the GRN/BRN by advancing the GRN/BRN a random number of times
