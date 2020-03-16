@@ -1417,17 +1417,17 @@ if overlay == true and infight == false then
 	      cur_tile = tile+0x200*i+0x4*j
             end
 	    gui.text(110+j*15,100+i*15, compress(cur_tile), color(cur_tile))
-			if eventcheck(compress(tile+0x200*i+0x4*j),objectlist) == true then
+			if eventcheck(compress(cur_tile),objectlist) == true then
 				gui.drawLine(108+j*15, 98+i*15, 123+j*15, 98+i*15, 0xFFFFFF00)
 				gui.drawLine(123+j*15, 98+i*15, 123+j*15, 108+i*15, 0xFFFFFF00)
 				gui.drawLine(123+j*15, 108+i*15, 108+j*15, 108+i*15, 0xFFFFFF00)
 				gui.drawLine(108+j*15, 108+i*15, 108+j*15, 98+i*15, 0xFFFFFF00)
-			elseif eventcheck(compress(tile+0x200*i+0x4*j),doorlist) == true then
+			elseif eventcheck(compress(cur_tile),doorlist) == true then
 				gui.drawLine(108+j*15, 98+i*15, 123+j*15, 98+i*15, 0xFF00FF00)
 				gui.drawLine(123+j*15, 98+i*15, 123+j*15, 108+i*15, 0xFF00FF00)
 				gui.drawLine(123+j*15, 108+i*15, 108+j*15, 108+i*15, 0xFF00FF00)
 				gui.drawLine(108+j*15, 108+i*15, 108+j*15, 98+i*15, 0xFF00FF00)
-			elseif eventcheck(compress(tile+0x200*i+0x4*j),eventlist) == true then
+			elseif eventcheck(compress(cur_tile),eventlist) == true then
 				gui.drawLine(108+j*15, 98+i*15, 123+j*15, 98+i*15, 0xFFFF00FF)
 				gui.drawLine(123+j*15, 98+i*15, 123+j*15, 108+i*15, 0xFFFF00FF)
 				gui.drawLine(123+j*15, 108+i*15, 108+j*15, 108+i*15, 0xFFFF00FF)
