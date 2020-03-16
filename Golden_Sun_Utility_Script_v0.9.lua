@@ -1365,7 +1365,15 @@ if overlay == true and infight == false then
 	  end
 	  return false
 	end
-
+		
+	if area ~= memory.read_u16_le(0x2000408) and eventtable > 0 and memory.read_u32_le(0x020301B8) > 0x02000000 and memory.read_u16_le(0x2000400)~=0 then
+		eventlist = {}
+		objectlist = {}
+		doorlist = {}
+		interesting_event()
+		area = memory.read_u16_le(0x2000408)
+	end
+		
 	function color(S)
 			T = tile_height(memory.read_u32_le(memory.read_u32_le(0x020301B8)))
 			U = tile_height(memory.read_u32_le(S))
