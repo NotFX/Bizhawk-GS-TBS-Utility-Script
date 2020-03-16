@@ -362,8 +362,8 @@ end
 while true do
 keypress = input.get()
 gui.text(0,460,"Frame:"..(emu.framecount()))
-gui.text(160,00,"BRN: ".. (memory.read_u32_le(AD4)))
-gui.text(160,15,"GRN: ".. (memory.read_u32_le(AD5)))
+gui.text(200,00,"BRN: ".. (memory.read_u32_le(AD4)))
+gui.text(200,15,"GRN: ".. (memory.read_u32_le(AD5)))
 
 if minorhudlock==false then
 if mem <= 0x2008000 then
@@ -656,7 +656,7 @@ end
  else
  gui.text(0,30,"Encounter: ".. (memory.read_u16_le(AD3)))
  gui.text(0,45,"Isaac PP: ".. (memory.read_u8(0x0200053A)))
- gui.text(160,30,"Rate: ".. NormalisedRate(AD6), ColorRate2)
+ gui.text(200,30,"Rate: ".. NormalisedRate(AD6), ColorRate2)
  gui.text(0,60,"PP Regen: ".. (math.floor((memory.read_u8(0x020301B5))/0xF)))
  end
 
