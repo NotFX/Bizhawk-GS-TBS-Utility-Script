@@ -1303,10 +1303,10 @@ if overlay == true and infight == false then
 	tile = memory.read_u32_le(0x020301B8)
 	tile_value = memory.read_u16_le(tile)
 
-	gui.line(108, 98, 123, 98)
-	gui.line(123, 98, 123, 108)
-	gui.line(123, 108, 108, 108)
-	gui.line(108, 108, 108, 98)
+	gui.drawLine(108, 98, 123, 98)
+	gui.drawLine(123, 98, 123, 108)
+	gui.drawLine(123, 108, 108, 108)
+	gui.drawLine(108, 108, 108, 98)
 
 	function compress(S)
 	    R = bit.rshift(memory.read_u32_le(S),16)
