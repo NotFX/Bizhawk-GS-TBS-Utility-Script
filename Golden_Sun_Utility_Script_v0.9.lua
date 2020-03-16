@@ -864,7 +864,7 @@ if (memory.read_u8(0x020309a0)) >= 1 then
 	RN= RNA(RN)
 	end
 
-	gui.text(160,45,"ACs to Run: " .. count)
+	gui.text(400,120,"ACs to Run: " .. count)
 
 		-- % Chance to Run
 	if nosq == true then
@@ -958,13 +958,13 @@ if nosq == false then -- normal any% probabilities follow from here
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
 
-		while effectproc(RNA(BRN),27,0,0) == false or unleash(BRN) == false do -- A Blade calculation
+		while effectproc(RNA(BRN),27,0,0) == false or unleash(BRN) == false do -- ABlade calculation
       bcount = bcount+1
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
 		end
 
-		gui.text(400,155,"Ablade Kill: " .. bcount)
+		gui.text(400,150,"Ablade Kill: " .. bcount)
 	end
 
 	if party == 15 and memory.read_u8(0x02000155) < 0x14 then -- Check question progression, if have Mia and before getting off boat then return WWand information
@@ -975,7 +975,7 @@ if nosq == false then -- normal any% probabilities follow from here
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
 		end
-		gui.text(400,140,"WWand Stun: " .. bcount)
+		gui.text(400,135,"WWand Stun: " .. bcount)
 	end
 
 	if memory.read_u8(0x0200050F) >= 9 and memory.read_u8(0x02000155) < 0x14 then -- Isaac level >= 9 and before getting off boat
@@ -986,7 +986,7 @@ if nosq == false then -- normal any% probabilities follow from here
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
 		end
-		gui.text(400,170,"Weaken: " .. bcount)
+		gui.text(400,165,"Weaken: " .. bcount)
 	end
 
 	if memory.read_u8(0x02000048)>=0x70 and memory.read_u8(0x02000155) < 0x14 then -- If you have mist, return mist information
@@ -997,7 +997,7 @@ if nosq == false then -- normal any% probabilities follow from here
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
 		end
-		gui.text(400,185,"Mist: " .. bcount)
+		gui.text(400,180,"Mist: " .. bcount)
 	end
 
 	if memory.read_u16_le(0x02000400)==0x1FE and memory.read_u16_le(0x02000404)==0x88 then -- If you are in Colosso return the following calculation
@@ -1008,7 +1008,7 @@ if nosq == false then -- normal any% probabilities follow from here
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
 		end
-		gui.text(400,200,"Scorch: " .. bcount)
+		gui.text(400,195,"Scorch: " .. bcount)
 	end
 end
 
