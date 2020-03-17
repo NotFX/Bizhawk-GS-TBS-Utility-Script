@@ -413,7 +413,7 @@ end
 
 	-- Cycle-based bossfight calculators follow
 	-- Determine the starting point for the Saturos battle
-local SaturosMoveset = {"HF", "FB", "Atk", "FB", "HF", "Atk", "Erup", "Atk"}
+local SaturosMoveset = {[0] = "HF", "FB", "Atk", "FB", "HF", "Atk", "Erup", "Atk"}
 local SaturosCycle = ModRoll(RNA(memory.read_u32_le(AD4)), 8)
 
 if memory.read_u8(0x020309A0)==0xA1 then     -- if we are fighting Sleet, show our starting point.
