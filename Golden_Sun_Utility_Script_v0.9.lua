@@ -540,15 +540,15 @@ local trn={}
 		if trn[j]==0xFF then -- if user has already acted then do nothing
 			j=j+1
 		else
-			gui.text(30+15*k,60,trn[j]) -- if user hasn't acted then display user in the turn order queue
+			gui.text(310+20*k,105,trn[j]) -- if user hasn't acted then display user in the turn order queue
 			j=j+1
 			k=k+1
 		end
 	end
 
-gui.text(0,60, "Turn Order: ")
+gui.text(210,105, "Turn Order: ")
 if memory.read_u8(0x020308B0)>0 then -- display enemy 1 HP during fight sequence
-	gui.text(0,45, "E1 HP: " .. memory.read_u16_le(0x020308B0))
+	gui.text(260,120, "E1 HP: " .. memory.read_u16_le(0x020308B0))
 else
 end
 end
