@@ -243,6 +243,9 @@ local tableState = false
            return ColorRateS
          end
 
+         function ModRoll(RNG, modvalue)
+  			return bit.rshift(RNG, 8) % modvalue
+			end
 
          function PercentRoll(RNG,Percent)
              rollTemp = RNG
@@ -413,7 +416,7 @@ end
 
 	-- Cycle-based bossfight calculators follow
 	-- Determine the starting point for the Saturos battle
-local SaturosCycle = (PercentRoll(RNA(memory.read_u32_le(AD4)),256))/32
+local SaturosCycle = (ModRoll(RNA(memory.read_u32_le(AD4)),8))
 
 if memory.read_u8(0x020309A0)==0xA1 then 	-- if we are fighting Sleet
 gui.text(0,250,"Saturos: " .. SaturosCycle)	-- show what cycle we'll end up on
