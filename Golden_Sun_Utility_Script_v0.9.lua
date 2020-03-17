@@ -385,7 +385,10 @@ while memcount <= 20000 and memory.read_u32_le(mem) == 0 or mem==0x02010000 do
 end
 
 gui.text(450,0,"Nonzero Tile: " .. memcount,nil,"bottomleft")
-gui.text(70,15,"Roll: " .. PercentRoll(RNA(memory.read_u32_le(AD4)),8))
+		
+if true then -- Fighting Sleet maybe? Needs consideration
+gui.text(0,250,"Saturos: " .. (PercentRoll(RNA(memory.read_u32_le(AD4)),256))/32)
+end
 end
 
 -- Attacks First, Caught by Surprise Check
