@@ -383,16 +383,18 @@ while memcount <= 20000 and memory.read_u32_le(mem) == 0 or mem==0x02010000 do
 	mem = mem-0x4
 	memcount = memcount+1
 end
-
-gui.text(450,0,"Nonzero Tile: " .. memcount,nil,"bottomleft")
-		
-if true then -- Fighting Sleet maybe? Needs consideration
-gui.text(0,250,"Saturos: " .. (PercentRoll(RNA(memory.read_u32_le(AD4)),256))/32)
+	
+	--show our X,Y coordinates while not in combat or the overworld
+if memory.read_u16_le(0x02000400)~=0x1FE and memory.read_u16_le(0x02000400)~=0x02 then
+gui.text(0,0,"X: " .. string.format("%.6f",(memory.read_u32_le(0x02030ec4)/1000000)),nil,"topright")
+gui.text(0,15,"Y: " .. string.format("%.6f",(memory.read_u32_le(0x02030ecc)/1000000)),nil,"topright")
 end
+
+	--find nonzero
+gui.text(450,0,"Nonzero Tile: " .. memcount,nil,"bottomleft")
 end
 
 -- Attacks First, Caught by Surprise Check
-
 function PS (R) -- Preemptive Strike Check, 0 = nothing, 1 = PS, 2= CBS
 	R1=R
 	R2 = RNB(R1)
@@ -409,11 +411,13 @@ function PS (R) -- Preemptive Strike Check, 0 = nothing, 1 = PS, 2= CBS
 	end
 end
 
---gui.text(140,20,"X: " .. (memory.read_u32_le(0x02030ec4))/1000000)
---gui.text(140,30,"Y: " .. (memory.read_u32_le(0x02030ecc))/1000000)
+	-- Cycle-based bossfight calculators follow
+	-- Determine the starting point for the Saturos battle
+local SaturosCycle = (PercentRoll(RNA(memory.read_u32_le(AD4)),256))/32
 
---g = memory.read_u32_le(AD5)
---print(bit.tohex(g))
+if memory.read_u8(0x020309A0)==0xA1 then 	-- if we are fighting Sleet
+gui.text(0,250,"Saturos: " .. SaturosCycle)	-- show what cycle we'll end up on
+end
 
 pc1 = memory.read_u8(0x02000438)
 pc2 = memory.read_u8(0x02000439)
@@ -421,7 +425,6 @@ pc3 = memory.read_u8(0x0200043A)
 pc4 = memory.read_u8(0x0200043B)
 
 		-- Missing Agility Scripts
-
 if memory.read_u16_le(0x02000400) ~= 0x1FE and minorhudlock==false and StatusMenuOpen == false then
 	iagi=memory.read_u8(0x02000500+0x1C+0x14C*0)
 	ilv=memory.read_u8(0x02000500+0x14C*0+0xF)
@@ -439,10 +442,7 @@ if memory.read_u16_le(0x02000400) ~= 0x1FE and minorhudlock==false and StatusMen
 end
 
 		-- begin enemy HP/encounter loops
-
 	--Agility Battle Scripts
-
-
 local pcag1=memory.read_u16_le(0x0203033C)
 local pcag2=memory.read_u16_le(0x0203033C+0x10)
 local pcag3=memory.read_u16_le(0x0203033C+0x20)
@@ -554,7 +554,6 @@ end
 end
 
 	-- Agility Bonus Calculator
-
 if memory.read_u8(0x0203033C-0x50)>0 then
 	local l=1
 	while memory.read_u8(0x02030328-0x50+0x10*l) ~= pc1 and l<15 do
@@ -604,7 +603,6 @@ end
 
 
 		-- HP/encounter display
-
     -- Colorrate stuff
     -- Encounter Rate Functions
     if CurrentRate ~= NormalisedRate(AD6) then
@@ -691,8 +689,6 @@ end
 -- end
 
 		-- begin RNG counters
-
-
 GRN = memory.read_u32_le(AD5)
 BRN = memory.read_u32_le(AD4)
 
@@ -751,9 +747,8 @@ bcount = 0
 end
 
 		-- Gui display
-
 gui.text(0,15,"GRN count: " .. gcount)
-gui.text(0,00,"BRN count: " .. brncount)
+gui.text(0,0,"BRN count: " .. brncount)
 
 		-- PS/CBS scripts
 		if minorhudlock == false then
@@ -809,12 +804,11 @@ if cbsbrn ~= BRN then
 	cbsbrn = BRN
 end
 
-	gui.text(0,120,"AF  " .. psc1 .. " " .. psc2 .. " " .. psc3)
-	gui.text(0,135,"CBS " .. cbsc1 .. " " .. cbsc2 .. " " .. cbsc3)
+	gui.text(0,200,"AF  " .. psc1 .. " " .. psc2 .. " " .. psc3)
+	gui.text(0,215,"CBS " .. cbsc1 .. " " .. cbsc2 .. " " .. cbsc3)
 end
 
 		-- Begin Flee/Assassinate Scripts
-
 local	el1 = memory.read_u8(0x02030887) -- Enemy 1 Level
 local el2 = memory.read_u8(0x020309d3) -- etc
 local	el3 = memory.read_u8(0x02030B1F)
@@ -1177,7 +1171,6 @@ end
 	end
 end
 -- This code is for BRN / GRN advance via keypresses (note AD4 = BRN and AD5 = GRN)
-
 if state == true and keypress["G"] == nil and keypress["H"] == nil and keypress["B"] == nil and keypress["N"] == nil and keypress["plus"] == nil and keypress["minus"] == nil then
 	state = false
 end
