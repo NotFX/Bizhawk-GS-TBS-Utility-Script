@@ -247,14 +247,11 @@ local tableState = false
   			return bit.rshift(RNG, 8) % modvalue
 			end
 
-         function PercentRoll(RNG,Percent)
-             rollTemp = RNG
-             rollTemp = bit.lshift(rollTemp,8)
-             rollTemp = bit.rshift(rollTemp,16)
-             rollTemp = rollTemp*Percent
-             rollTemp = bit.rshift(rollTemp,16)
-             return rollTemp
-           end
+         --function PercentRoll(RNG,Percent) 		--unused
+ 		 	--RNG = bit.band(bit.rshift(RNG,8), 0xFFFF)
+ 		 	--return bit.rshift(RNG*Percent,16)
+		--end
+
            function RNR (R) -- RN reverse Function
             gout = bit.band((R-0x3039),0xFFFFFFFF) -- or 0xFFFFFFFF? 0x80000000 seems to be the cap for the RNG
             multi = 0x41c64e6d
@@ -398,7 +395,7 @@ gui.text(450,0,"Nonzero Tile: " .. memcount,nil,"bottomleft")
 end
 
 -- Attacks First, Caught by Surprise Check
-function PS (R) -- Preemptive Strike Check, 0 = nothing, 1 = PS, 2= CBS
+function PS (R) -- Attacks First Check, 0 = nothing, 1 = AF, 2 = CBS
 	R1=R
 	R2 = RNB(R1)
 	R1 = bit.lshift(R1,8)
@@ -416,10 +413,11 @@ end
 
 	-- Cycle-based bossfight calculators follow
 	-- Determine the starting point for the Saturos battle
-local SaturosCycle = (ModRoll(RNA(memory.read_u32_le(AD4)),8))
+local SaturosMoveset = {"HF", "FB", "Atk", "FB", "HF", "Atk", "Erup", "Atk"}
+local SaturosCycle = ModRoll(RNA(memory.read_u32_le(AD4)), 8)
 
-if memory.read_u8(0x020309A0)==0xA1 then 	-- if we are fighting Sleet
-gui.text(0,250,"Saturos: " .. SaturosCycle)	-- show what cycle we'll end up on
+if memory.read_u8(0x020309A0)==0xA1 then     -- if we are fighting Sleet, show our starting point.
+gui.text(0,250,"Saturos: " .. SaturosMoveset[SaturosCycle] .. "-" .. SaturosMoveset[(SaturosCycle + 1) % 8])
 end
 
 pc1 = memory.read_u8(0x02000438)
