@@ -291,26 +291,7 @@ local tableState = false
              return gin
             end
 
-
-
-	--eel = memory.read_u8(0x0203089E) -- venus res
-	--eme = memory.read_u8(0x020308A2)
-	--ema = memory.read_u8(0x020308A6)
-	--eju = memory.read_u8(0x020308A8)
-
-	-- Vulnerability Key
---12 = Drop Def 25%
---13 = Drop def 12%
---16 = res drop 40
---17 = res drop 20
---20 = delusion
---23 = stun
---24 = sleep
---27 = death
---31 = HP steal
---32 = PP steal
---60 = 50% dmg to health
---69 = 10% dmg to PP
+--begin the script proper
 print("Welcome to the Golden Sun Utility Script")
 print("Currently configured for " .. version .. " version")
 print("Commands:")
@@ -497,41 +478,6 @@ if 	memory.read_u8(0x02030368)==0xFF and memory.read_u8(0x02030368+0x02)==0 then
 	else
 	end
 
--- elseif memory.read_u8(0x02030368)==0xFF and memory.read_u8(0x02030358)==0xFF then -- Hacky way of accounting for three person party
-	-- gui.text(0,60,"PC" .. pc1 .. " Agi: " .. pcag1)
-	-- gui.text(0,75,"PC" .. pc2 .. " Agi: " .. pcag2)
-	-- gui.text(0,90,"PC" .. pc3 .. " Agi: " .. pcag3)
-
-	-- if memory.read_u8(0x02030900)>0 then
-		-- gui.text(60,40, "E1 Agi: " .. memory.read_u8(0x020308E4)) -- If Enemy 1 has nonzero HP display E1 agility
-		-- gui.text(110,40, "HP: " .. memory.read_u8(0x02030900+0x14C*0))
-	-- else
-	-- end
-
-	-- if memory.read_u8(0x02030900+0x14C)>0 then
-		-- gui.text(60,50, "E2 Agi: " .. memory.read_u8(0x020308E4+0x14C))
-		-- gui.text(110,50, "HP: " .. memory.read_u8(0x02030900+0x14C*1))
-	-- else
-	-- end
-
-	-- if memory.read_u8(0x02030900+0x14C*2)>0 then
-		-- gui.text(60,60, "E3 Agi: " .. memory.read_u8(0x020308E4+0x14C*2))
-		-- gui.text(110,60, "HP: " .. memory.read_u8(0x02030900+0x14C*2))
-	-- else
-	-- end
-
-	-- if memory.read_u8(0x02030900+0x14C*3)>0 then
-		-- gui.text(60,70, "E4 Agi: " .. memory.read_u8(0x020308E4+0x14C*3))
-		-- gui.text(110,70, "HP: " .. memory.read_u8(0x02030900+0x14C*3))
-	-- else
-	-- end
-
-	-- if memory.read_u8(0x02030900+0x14C*4)>0 then
-		-- gui.text(60,80, "E5 Agi: " .. memory.read_u8(0x020308E4+0x14C*4))
-		-- gui.text(110,80, "HP: " .. memory.read_u8(0x02030900+0x14C*4))
-	-- else
-	-- end
-
 elseif memory.read_u16_le(0x02000400)==0x1FE then -- otherwise, we are in a battle and do the following
 local j=1
 local k=1
@@ -657,7 +603,7 @@ end
     end
 
  if memory.read_u8(0x020309a0) >= 1 then
--- gui.text(0,20,"Enemy 1 HP: " .. (memory.read_u16_le(0x020308B0)))
+--
  else
  gui.text(0,30,"Encounter: ".. (memory.read_u16_le(AD3)))
  gui.text(0,45,"Isaac PP: ".. (memory.read_u8(0x0200053A)))
@@ -677,17 +623,6 @@ else
   encounterColor = 0xFFFFFFFF
   encounterPreviousvalue = memory.read_u32_le(0x02000478)
 end
--- if memory.read_u8(0x02030AEC) >= 1 then
--- gui.text(0,30,"Enemy 2 HP: " .. (memory.read_u16_le(0x020309FC)))
--- end
-
--- if memory.read_u8(0x02030C38) >= 1 then
--- gui.text(0,40,"Enemy 3 HP: " .. (memory.read_u16_le(0x02030B48)))
--- end
-
--- if memory.read_u8(0x02030D84) >= 1 then
--- gui.text(0,50,"Enemy 4 HP: " .. (memory.read_u16_le(0x02030c94)))
--- end
 
 		-- begin RNG counters
 GRN = memory.read_u32_le(AD5)
@@ -809,16 +744,39 @@ end
 	gui.text(0,215,"CBS " .. cbsc1 .. " " .. cbsc2 .. " " .. cbsc3)
 end
 
+		--necessary information for the following scripts
+	--eel = memory.read_u8(0x0203089E)  venus resistance
+	--eme = memory.read_u8(0x020308A2)  merc  res
+	--ema = memory.read_u8(0x020308A6)  mars  res
+	--eju = memory.read_u8(0x020308A8)  jup   res
+
+	-- Vulnerability Key
+--12 = Drop Def 25%
+--13 = Drop def 12%
+--16 = res drop 40
+--17 = res drop 20
+--20 = delusion
+--23 = stun
+--24 = sleep
+--27 = death
+--31 = HP steal
+--32 = PP steal
+--60 = 50% dmg to health
+--69 = 10% dmg to PP
+
 		-- Begin Flee/Assassinate Scripts
-local	el1 = memory.read_u8(0x02030887) -- Enemy 1 Level
-local el2 = memory.read_u8(0x020309d3) -- etc
+local	el1 = memory.read_u8(0x02030887) 	-- Enemy 1 Level
+local 	el2 = memory.read_u8(0x020309d3) 	-- etc
 local	el3 = memory.read_u8(0x02030B1F)
 local	el4 = memory.read_u8(0x02030c6b)
-local	party = memory.read_u8(0x02000040) -- Party member number
-local	isl= memory.read_u8(0x0200050F) -- Isaac level
-local	gal= memory.read_u8(0x0200065b) -- etc
+local	party = memory.read_u8(0x02000040)	-- Party member number
+local	isl= memory.read_u8(0x0200050F) 	-- Isaac level
+local	gal= memory.read_u8(0x0200065b) 	-- etc
 local	ivl= memory.read_u8(0x020007a7)
 local	mil= memory.read_u8(0x020008F3)
+--local	ABladeUser= memory.read_u8(0x020..) -- Who Has ABlade
+--local   ScorchUser= memory.read_u8(0x020..) -- Scorch
+--local   MistUser=   memory.read_u8(0x020..) -- Mist
 
 if (memory.read_u8(0x020309a0)) >= 1 then
 
@@ -917,13 +875,14 @@ if (memory.read_u8(0x020309a0)) >= 1 then
 		return c
 	end
 
-	function effectproc (S,E,Elm,U) -- Random number, What effect is this, Elmemental Affinity 0 = Venus, 1 = Mercury, 2= Mars, 3 = Jupiter, Who is using this 0 = Isaac, 1 = Garet, 2 = Ivan, 3 = Mia
-		uelm = memory.read_u8(0x0200061C+U*0x14C+Elm) -- Elemental Power of User
-		eluc = memory.read_u8(0x020308BA) -- Enemy Luck
-		eind = memory.read_u8(0x020309a0) -- Enemy Index
-		eelm = enemy(eind,Elm) -- Enemy Elemental Levels
-		vul1, vul2, vul3 = vuln(eind) -- Enemy Vulnerability
-		if vul1 == E or vul2 == E or vul3 == E then -- Vulnerability key at top
+	function effectproc (S,E,Elm,U) -- Random number, What effect is this, Elmemental Affinity 0 = Venus, 1 = Mercury, 2= Mars, 3 = Jupiter, 
+									-- Who is using this 0 = Isaac, 1 = Garet, 2 = Ivan, 3 = Mia
+		uelm = memory.read_u8(0x0200061C+U*0x14C+Elm) 	-- Elemental Power of User
+		eluc = memory.read_u8(0x020308BA) 				-- Enemy Luck
+		eind = memory.read_u8(0x020309a0)				-- Enemy Index
+		eelm = enemy(eind,Elm) 							-- Enemy Elemental Levels
+		vul1, vul2, vul3 = vuln(eind) 					-- Enemy Vulnerability
+		if vul1 == E or vul2 == E or vul3 == E then 	-- Vulnerability key at top
 			v=25
 			else
 			v=00
@@ -987,7 +946,18 @@ if nosq == false then -- normal any% probabilities follow from here
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
 		end
-		gui.text(400,165,"Weaken: " .. bcount)
+		gui.text(400,165,"IWeaken: " .. bcount)
+	end
+
+	if memory.read_u8(0x0200065B) >= 9 and memory.read_u8(0x02000155) < 0x14 then -- Garet level >= 9 and before getting off boat
+		BRN = memory.read_u32_le(0x020023A8)
+		bcount=0
+		while effectproc(BRN,16,3,1) == false do -- Weaken calculation
+			bcount = bcount+1
+			if bcount == 100 then break end
+			BRN=RNA(BRN)
+		end
+		gui.text(400,165,"GWeaken: " .. bcount)
 	end
 
 	if memory.read_u8(0x02000048)>=0x70 and memory.read_u8(0x02000155) < 0x14 then -- If you have mist, return mist information
