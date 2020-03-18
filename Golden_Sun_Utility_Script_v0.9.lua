@@ -933,21 +933,20 @@ if (memory.read_u8(0x020309a0)) >= 1 then
 
 	local   DjinnType = {VenusDjinn,MercDjinn,MarsDjinn,JupDjinn} -- Lets us select the element we need
 
-	function FindDjinniHolder(DjinnName) -- this lets us find out who's holding a specific djinni
-		local DjinnIndex = nil
-		local ElementNum = nil
+	function FindDjinniHolder(DjinnName)
+		local DjinnIndex, ElementNum
 		for i=1,4 do
-			DjinnIndex = FindKey(DjinnType[i],DjinnName) - 1
-			if DjinnIndex ~= nil then ElementNum = i
-
-		local BaseAddress = 0x020005F8 + 4*ElementNum
+			DjinnIndex = FindKey(DjinnType[i], DjinnName)
+			if DjinnIndex ~= nil then ElementNum = i-1; break; end
+		end
+		DjinnIndex = DjinnIndex - 1
+		
+		local baseaddr = 0x020005F8 + 4*ElementNum
 		for i=0,3 do
-			if bit.band(2^DjinnIndex,memory.read_u8(BaseAddress + 0x14C*i))~=DjinnIndex then 
-			  return i
+			if bit.band(2^DjinnIndex,memory.readbyte(baseaddr + 0x14C*i)) ~= 0 then 
+				return i
 			end
 		end
-
-		
 	end
 
 
