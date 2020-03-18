@@ -376,7 +376,7 @@ gui.text(450,0,"Nonzero Tile: " .. memcount,nil,"bottomleft")
 end
 
 -- Attacks First, Caught by Surprise Check
-function PS (R) -- Attacks First Check, 0 = nothing, 1 = AF, 2 = CBS
+function AF (R) -- Attacks First Check, 0 = nothing, 1 = AF, 2 = CBS
 	R1=R
 	R2 = RNB(R1)
 	R1 = bit.lshift(R1,8)
@@ -688,30 +688,30 @@ gui.text(0,0,"BRN count: " .. brncount)
 
 		-- PS/CBS scripts
 		if minorhudlock == false then
-psb=00
+afb=00
 cbsb=00
 
-if psbrn ~= BRN then
-	psb = BRN
-	psb = RNA(psb)
+if afbrn ~= BRN then
+	afb = BRN
+	afb = RNA(afb)
 	psc1 = 0
-	while PS(psb) ~= 1 do
-		psb = RNA(psb)
+	while AF(afb) ~= 1 do
+		afb = RNA(afb)
 		psc1 = psc1 + 1
 	end
 	psc2 = psc1+1
-	psb = RNA(psb)
-	while PS(psb) ~=1 do
-		psb = RNA(psb)
+	afb = RNA(afb)
+	while AF(afb) ~=1 do
+		afb = RNA(afb)
 		psc2 = psc2 + 1
 	end
 	psc3 = psc2+1
-	psb = RNA(psb)
-	while PS(psb) ~= 1 do
-		psb = RNA(psb)
+	afb = RNA(afb)
+	while PS(afb) ~= 1 do
+		afb = RNA(afb)
 		psc3 = psc3 + 1
 	end
-	psbrn=BRN
+	afbrn=BRN
 end
 
 if cbsbrn ~= BRN then
@@ -774,9 +774,6 @@ local	isl= memory.read_u8(0x0200050F) 	-- Isaac level
 local	gal= memory.read_u8(0x0200065b) 	-- etc
 local	ivl= memory.read_u8(0x020007a7)
 local	mil= memory.read_u8(0x020008F3)
-local	BladeUser	-- Who Has Assassin's Blade, range 0 - 3
-local	ScorchUser	-- Scorch
-local	MistUser	-- Mist
 
 if (memory.read_u8(0x020309a0)) >= 1 then
 
@@ -875,6 +872,10 @@ if (memory.read_u8(0x020309a0)) >= 1 then
 		return c
 	end
 
+	local	BladeUser	-- Who Has Assassin's Blade
+	local	ScorchUser
+	local	MistUser
+
 	function effectproc (S,E,Elm,U) -- Random number, What effect is this, Elmemental Affinity 0 = Venus, 1 = Mercury, 2= Mars, 3 = Jupiter, 
 									-- Who is using this 0 = Isaac, 1 = Garet, 2 = Ivan, 3 = Mia
 		uelm = memory.read_u8(0x0200061C+U*0x14C+Elm) 	-- Elemental Power of User
@@ -913,12 +914,12 @@ if (memory.read_u8(0x020309a0)) >= 1 then
 		end
 	end
 
-if nosq == false then -- normal any% probabilities follow from here
-	if memory.read_u8(0x0200010F) == 0x8A then -- if past kraken only return A Blade information.
+if nosq == false then	-- normal any% probabilities follow from here
+	if memory.read_u8(0x0200010F) == 0x8A then	-- if past kraken only return A Blade information.
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
 
-		while effectproc(RNA(BRN),27,0,0) == false or unleash(BRN) == false do -- ABlade calculation
+		while effectproc(RNA(BRN),27,0,BladeUser) == false or unleash(BRN) == false do	-- ABlade calculation
       bcount = bcount+1
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
@@ -927,10 +928,10 @@ if nosq == false then -- normal any% probabilities follow from here
 		gui.text(400,150,"Ablade Kill: " .. bcount)
 	end
 
-	if party == 15 and memory.read_u8(0x02000155) < 0x14 then -- have Mia and before getting off boat
+	if party == 15 and memory.read_u8(0x02000155) < 0x14 then	-- have Mia and before getting off boat
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
-		while effectproc(RNA(BRN),23,3,3) == false or unleash(BRN) == false do -- WWand calculation
+		while effectproc(RNA(BRN),23,3,3) == false or unleash(BRN) == false do	-- WWand calculation
 			bcount = bcount+1
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
@@ -938,10 +939,10 @@ if nosq == false then -- normal any% probabilities follow from here
 		gui.text(400,135,"WWand Stun: " .. bcount)
 	end
 
-	if memory.read_u8(0x0200050F) >= 9 and memory.read_u8(0x02000155) < 0x14 then -- Isaac level >= 9 and before getting off boat
+	if memory.read_u8(0x0200050F) >= 9 and memory.read_u8(0x02000155) < 0x14 then	-- Isaac level >= 9 and before getting off boat
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
-		while effectproc(BRN,16,3,0) == false do -- Weaken calculation
+		while effectproc(BRN,16,3,0) == false do	-- Weaken calculation
 			bcount = bcount+1
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
@@ -949,7 +950,7 @@ if nosq == false then -- normal any% probabilities follow from here
 		gui.text(400,165,"IWeaken: " .. bcount)
 	end
 
-	if memory.read_u8(0x0200065B) >= 9 and memory.read_u8(0x02000155) < 0x14 then -- Garet level >= 9 and before getting off boat
+	if memory.read_u8(0x0200065B) >= 9 and memory.read_u8(0x02000155) < 0x14 then	-- Garet level >= 9 and before getting off boat
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
 		while effectproc(BRN,16,3,1) == false do
@@ -960,21 +961,21 @@ if nosq == false then -- normal any% probabilities follow from here
 		gui.text(400,180,"GWeaken: " .. bcount)
 	end
 
-	if memory.read_u8(0x02000048)>=0x70 and memory.read_u8(0x02000155) < 0x14 then -- have mist and before getting off boat
+	if memory.read_u8(0x02000048)>=0x70 and memory.read_u8(0x02000155) < 0x14 then	-- have Mist and before getting off boat
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
-		while effectproc(RNA(BRN),24,1,3) == false do -- or unleash(BRN) == false do -- mist calculation
+		while effectproc(RNA(BRN),24,1,MistUser) == false do
 			bcount = bcount+1
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
 		end
 		gui.text(400,195,"Mist: " .. bcount)
 	end
-
-	if memory.read_u16_le(0x02000400)==0x1FE and memory.read_u16_le(0x02000404)==0x88 then -- If you are in Colosso return the following calculation
+																					-- Navampa Win/Lose is stored at 0200016A
+	if memory.read_u8(0x02000404)==0x88 and memory.read_u8(0x0200016C)~=0x80 then	-- have Scorch and before Colloso ends 
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
-		while effectproc(RNA(BRN),23,0,2) == false do --or unleash(BRN) == false do -- mist calculation
+		while effectproc(RNA(BRN),23,0,ScorchUser) == false do
 			bcount = bcount+1
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
