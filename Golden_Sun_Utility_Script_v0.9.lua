@@ -872,10 +872,6 @@ if (memory.read_u8(0x020309a0)) >= 1 then
 		return c
 	end
 
-	local	BladeUser	-- Who Has Assassin's Blade
-	local	ScorchUser
-	local	MistUser
-
 	function effectproc (S,E,Elm,U) -- Random number, What effect is this, Elmemental Affinity 0 = Venus, 1 = Mercury, 2= Mars, 3 = Jupiter, 
 									-- Who is using this 0 = Isaac, 1 = Garet, 2 = Ivan, 3 = Mia
 		uelm = memory.read_u8(0x0200061C+U*0x14C+Elm) 	-- Elemental Power of User
@@ -914,28 +910,67 @@ if (memory.read_u8(0x020309a0)) >= 1 then
 		end
 	end
 
+	function FindKey(table, value) -- function to help search arrays
+		for k,v in pairs(table) do
+		  if v == value then return k end
+		end
+	end
+
+	function FindItemHolder(ItemIndex) -- this lets us find out who's wearing a specific item
+		for i=0,3 do
+		    for j=0,14 do
+			  if bit.band(memory.read_u16_le(0x020005D8 + 2*j + 0x14C*i), 2^9 - 1)==ItemIndex then
+				return i
+			  end
+		    end
+		end
+	end
+
+	function FindDjinniHolder(DjinnIndex) -- this lets us find out who's holding a specific djinni
+		for i=0,3 do
+			if bit.band(2^(FindKey-1),memory.read_u8(0x020005FC + 0x14C*i))~=DjinnIndex then 
+			  return i
+			end
+		end
+	end
+
+
+	local	BladeUser = FindItemHolder(17)	-- Who has [item/djinni]
+	local   WitchUser = FindItemHolder(39)
+	local	ScorchUser
+	local	MistUser
+		
+	local   VenusDjinn = {"Flint","Granite","Quartz","Vine","Sap","Ground","Bane"}  -- Array of all TBS Djinn
+	local   MercDjinn = {"Fizz","Sleet","Mist","Spritz","Hail","Tonic","Dew"}
+	local   MarsDjinn = {"Forge","Fever","Corona","Scorch","Ember","Flash","Torch"}
+	local   JupDjinn = {"Gust","Breeze","Zephyr","Smog","Kite","Squall","Luff"}
+
+
+	  	-- begin BRN calculations for procs
 if nosq == false then	-- normal any% probabilities follow from here
 	if memory.read_u8(0x0200010F) == 0x8A then	-- if past kraken only return A Blade information.
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
 
-		while effectproc(RNA(BRN),27,0,BladeUser) == false or unleash(BRN) == false do	-- ABlade calculation
+		while effectproc(RNA(BRN),27,0,BladeUser) == false or unleash(BRN) == false do	-- Blade calculation
       bcount = bcount+1
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
 		end
 
-		gui.text(400,150,"Ablade Kill: " .. bcount)
+		gui.text(400,150,"ABlade Kill: " .. bcount)
 	end
 
 	if party == 15 and memory.read_u8(0x02000155) < 0x14 then	-- have Mia and before getting off boat
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
-		while effectproc(RNA(BRN),23,3,3) == false or unleash(BRN) == false do	-- WWand calculation
+
+		while effectproc(RNA(BRN),23,3,WitchUser) == false or unleash(BRN) == false do	-- WWand calculation
 			bcount = bcount+1
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
 		end
+
 		gui.text(400,135,"WWand Stun: " .. bcount)
 	end
 
@@ -964,6 +999,14 @@ if nosq == false then	-- normal any% probabilities follow from here
 	if memory.read_u8(0x02000048)>=0x70 and memory.read_u8(0x02000155) < 0x14 then	-- have Mist and before getting off boat
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
+
+		for i=0,3 do
+			if bit.band(2^3,memory.read_u8(0x020005FC + 0x14C*i))~=0 then 
+
+			  MistUser = i ; break
+			end
+		end
+
 		while effectproc(RNA(BRN),24,1,MistUser) == false do
 			bcount = bcount+1
 			if bcount == 100 then break end
@@ -975,6 +1018,14 @@ if nosq == false then	-- normal any% probabilities follow from here
 	if memory.read_u8(0x02000404)==0x88 and memory.read_u8(0x0200016C)~=0x80 then	-- have Scorch and before Colloso ends 
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
+
+		for i=0,3 do
+			if bit.band(2^4,memory.read_u8(0x02000600 + 0x14C*i))~=0 then 
+
+			  ScorchUser = i ; break
+			end
+		end
+
 		while effectproc(RNA(BRN),23,0,ScorchUser) == false do
 			bcount = bcount+1
 			if bcount == 100 then break end
