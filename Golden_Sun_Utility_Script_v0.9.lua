@@ -984,6 +984,7 @@ if nosq == false then	-- normal any% probabilities follow from here
 	if memory.read_u8(0x0200050F) >= 9 and memory.read_u8(0x02000155) < 0x14 then	-- Isaac level >= 9 and before getting off boat
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
+
 		while effectproc(BRN,16,3,0) == false do	-- Weaken calculation
 			bcount = bcount+1
 			if bcount == 100 then break end
@@ -995,6 +996,7 @@ if nosq == false then	-- normal any% probabilities follow from here
 	if memory.read_u8(0x0200065B) >= 9 and memory.read_u8(0x02000155) < 0x14 then	-- Garet level >= 9 and before getting off boat
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
+		
 		while effectproc(BRN,16,3,1) == false do
 			bcount = bcount+1
 			if bcount == 100 then break end
@@ -1019,7 +1021,7 @@ if nosq == false then	-- normal any% probabilities follow from here
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
 
-		while effectproc(RNA(BRN),23,0,ScorchUser) == false do
+		while effectproc(RNA(BRN),23,2,ScorchUser) == false do
 			bcount = bcount+1
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
