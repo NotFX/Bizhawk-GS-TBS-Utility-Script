@@ -942,7 +942,7 @@ if (memory.read_u8(0x020309a0)) >= 1 then
 
 		local BaseAddress = 0x020005F8 + 4*ElementNum
 		for i=0,3 do
-			if bit.band(2^DjinnIndex),memory.read_u8(BaseAddress + 0x14C*i))~=DjinnIndex then 
+			if bit.band(2^DjinnIndex,memory.read_u8(BaseAddress + 0x14C*i))~=DjinnIndex then 
 			  return i
 			end
 		end
