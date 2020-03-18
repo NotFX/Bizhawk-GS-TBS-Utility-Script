@@ -941,9 +941,9 @@ if (memory.read_u8(0x020309a0)) >= 1 then
 		end
 		DjinnIndex = DjinnIndex - 1
 		
-		local baseaddr = 0x020005F8 + 4*ElementNum
+		local BaseAddress = 0x020005F8 + 4*ElementNum
 		for i=0,3 do
-			if bit.band(2^DjinnIndex,memory.readbyte(baseaddr + 0x14C*i)) ~= 0 then 
+			if bit.band(2^DjinnIndex,memory.readbyte(BaseAddress + 0x14C*i)) ~= 0 then 
 				return i
 			end
 		end
