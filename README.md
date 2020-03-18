@@ -8,7 +8,7 @@ How to use:
 
 2)Load mGBA core
 
-3)Load either GS:TBS or GS:TLA
+3)Load GS:TBS
 
 3)Open LUA console
 
