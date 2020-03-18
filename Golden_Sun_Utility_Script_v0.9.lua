@@ -686,7 +686,7 @@ end
 gui.text(0,15,"GRN count: " .. gcount)
 gui.text(0,0,"BRN count: " .. brncount)
 
-		-- PS/CBS scripts
+		-- AF/CBS scripts
 		if minorhudlock == false then
 afb=00
 cbsb=00
@@ -694,22 +694,22 @@ cbsb=00
 if afbrn ~= BRN then
 	afb = BRN
 	afb = RNA(afb)
-	psc1 = 0
+	afc1 = 0
 	while AF(afb) ~= 1 do
 		afb = RNA(afb)
-		psc1 = psc1 + 1
+		afc1 = afc1 + 1
 	end
-	psc2 = psc1+1
+	afc2 = afc1+1
 	afb = RNA(afb)
 	while AF(afb) ~=1 do
 		afb = RNA(afb)
-		psc2 = psc2 + 1
+		afc2 = afc2 + 1
 	end
-	psc3 = psc2+1
+	afc3 = afc2+1
 	afb = RNA(afb)
-	while PS(afb) ~= 1 do
+	while AF(afb) ~= 1 do
 		afb = RNA(afb)
-		psc3 = psc3 + 1
+		afc3 = afc3 + 1
 	end
 	afbrn=BRN
 end
@@ -718,21 +718,21 @@ if cbsbrn ~= BRN then
 	cbsb = BRN
 	cbsb = RNA(cbsb)
 	cbsc1 = 0
-	while PS(cbsb) ~= 2 do
+	while AF(cbsb) ~= 2 do
 		cbsb = RNA(cbsb)
 		cbsc1 = cbsc1 + 1
 		if cbsc1 == 100 then break end
 	end
 	cbsc2 = cbsc1+1
 	cbsb = RNA(cbsb)
-	while PS(cbsb) ~= 2 do
+	while AF(cbsb) ~= 2 do
 		cbsb = RNA(cbsb)
 		cbsc2 = cbsc2 + 1
 		if cbsc2 == 102 then break end
 	end
 	cbsc3 = cbsc2+1
 	cbsb = RNA(cbsb)
-	while PS(cbsb) ~= 2 do
+	while AF(cbsb) ~= 2 do
 		cbsb = RNA(cbsb)
 		cbsc3 = cbsc3 + 1
 		if cbsc3 == 104 then break end
@@ -740,7 +740,7 @@ if cbsbrn ~= BRN then
 	cbsbrn = BRN
 end
 
-	gui.text(0,200,"AF  " .. psc1 .. " " .. psc2 .. " " .. psc3)
+	gui.text(0,200,"AF  " .. afc1 .. " " .. afc2 .. " " .. afc3)
 	gui.text(0,215,"CBS " .. cbsc1 .. " " .. cbsc2 .. " " .. cbsc3)
 end
 
