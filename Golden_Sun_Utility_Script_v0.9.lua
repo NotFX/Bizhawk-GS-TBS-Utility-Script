@@ -926,25 +926,35 @@ if (memory.read_u8(0x020309a0)) >= 1 then
 		end
 	end
 
-	function FindDjinniHolder(DjinnIndex) -- this lets us find out who's holding a specific djinni
-		for i=0,3 do
-			if bit.band(2^(FindKey-1),memory.read_u8(0x020005FC + 0x14C*i))~=DjinnIndex then 
-			  return i
-			end
-		end
-	end
-
-
-	local	BladeUser = FindItemHolder(17)	-- Who has [item/djinni]
-	local   WitchUser = FindItemHolder(39)
-	local	ScorchUser
-	local	MistUser
-		
 	local   VenusDjinn = {"Flint","Granite","Quartz","Vine","Sap","Ground","Bane"}  -- Array of all TBS Djinn
 	local   MercDjinn = {"Fizz","Sleet","Mist","Spritz","Hail","Tonic","Dew"}
 	local   MarsDjinn = {"Forge","Fever","Corona","Scorch","Ember","Flash","Torch"}
 	local   JupDjinn = {"Gust","Breeze","Zephyr","Smog","Kite","Squall","Luff"}
 
+	local   DjinnType = {VenusDjinn,MercDjinn,MarsDjinn,JupDjinn} -- Lets us select the element we need
+
+	function FindDjinniHolder(DjinnName) -- this lets us find out who's holding a specific djinni
+		local DjinnIndex = nil
+		local ElementNum = nil
+		for i=1,4 do
+			DjinnIndex = FindKey(DjinnType[i],DjinnName) - 1
+			if DjinnIndex ~= nil then ElementNum = i
+
+		local BaseAddress = 0x020005F8 + 4*ElementNum
+		for i=0,3 do
+			if bit.band(2^DjinnIndex),memory.read_u8(BaseAddress + 0x14C*i))~=DjinnIndex then 
+			  return i
+			end
+		end
+
+		
+	end
+
+
+	local	BladeUser = FindItemHolder(17)	-- Who has [item/djinni]
+	local   WitchUser = FindItemHolder(39)
+	local	ScorchUser = FindDjinniHolder("Scorch")
+	local	MistUser = FindDjinniHolder("Mist")
 
 	  	-- begin BRN calculations for procs
 if nosq == false then	-- normal any% probabilities follow from here
@@ -957,7 +967,6 @@ if nosq == false then	-- normal any% probabilities follow from here
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
 		end
-
 		gui.text(400,150,"ABlade Kill: " .. bcount)
 	end
 
@@ -970,7 +979,6 @@ if nosq == false then	-- normal any% probabilities follow from here
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
 		end
-
 		gui.text(400,135,"WWand Stun: " .. bcount)
 	end
 
@@ -1000,13 +1008,6 @@ if nosq == false then	-- normal any% probabilities follow from here
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
 
-		for i=0,3 do
-			if bit.band(2^3,memory.read_u8(0x020005FC + 0x14C*i))~=0 then 
-
-			  MistUser = i ; break
-			end
-		end
-
 		while effectproc(RNA(BRN),24,1,MistUser) == false do
 			bcount = bcount+1
 			if bcount == 100 then break end
@@ -1018,13 +1019,6 @@ if nosq == false then	-- normal any% probabilities follow from here
 	if memory.read_u8(0x02000404)==0x88 and memory.read_u8(0x0200016C)~=0x80 then	-- have Scorch and before Colloso ends 
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
-
-		for i=0,3 do
-			if bit.band(2^4,memory.read_u8(0x02000600 + 0x14C*i))~=0 then 
-
-			  ScorchUser = i ; break
-			end
-		end
 
 		while effectproc(RNA(BRN),23,0,ScorchUser) == false do
 			bcount = bcount+1
