@@ -766,7 +766,7 @@ end
 
 		-- Begin Flee/Assassinate Scripts
 local	el1 = memory.read_u8(0x02030887) 	-- Enemy 1 Level
-local 	el2 = memory.read_u8(0x020309d3) 	-- etc
+local	el2 = memory.read_u8(0x020309d3) 	-- etc
 local	el3 = memory.read_u8(0x02030B1F)
 local	el4 = memory.read_u8(0x02030c6b)
 local	party = memory.read_u8(0x02000040)	-- Party member number
@@ -774,9 +774,9 @@ local	isl= memory.read_u8(0x0200050F) 	-- Isaac level
 local	gal= memory.read_u8(0x0200065b) 	-- etc
 local	ivl= memory.read_u8(0x020007a7)
 local	mil= memory.read_u8(0x020008F3)
---local	ABladeUser= memory.read_u8(0x020..) -- Who Has ABlade
---local   ScorchUser= memory.read_u8(0x020..) -- Scorch
---local   MistUser=   memory.read_u8(0x020..) -- Mist
+local	BladeUser	-- Who Has Assassin's Blade, range 0 - 3
+local	ScorchUser	-- Scorch
+local	MistUser	-- Mist
 
 if (memory.read_u8(0x020309a0)) >= 1 then
 
@@ -914,7 +914,7 @@ if (memory.read_u8(0x020309a0)) >= 1 then
 	end
 
 if nosq == false then -- normal any% probabilities follow from here
-	if memory.read_u8(0x0200010F) == 0x8A then -- Check quest progression, if past kraken only return A Blade information.
+	if memory.read_u8(0x0200010F) == 0x8A then -- if past kraken only return A Blade information.
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
 
@@ -927,7 +927,7 @@ if nosq == false then -- normal any% probabilities follow from here
 		gui.text(400,150,"Ablade Kill: " .. bcount)
 	end
 
-	if party == 15 and memory.read_u8(0x02000155) < 0x14 then -- Check question progression, if have Mia and before getting off boat then return WWand information
+	if party == 15 and memory.read_u8(0x02000155) < 0x14 then -- have Mia and before getting off boat
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
 		while effectproc(RNA(BRN),23,3,3) == false or unleash(BRN) == false do -- WWand calculation
@@ -952,23 +952,23 @@ if nosq == false then -- normal any% probabilities follow from here
 	if memory.read_u8(0x0200065B) >= 9 and memory.read_u8(0x02000155) < 0x14 then -- Garet level >= 9 and before getting off boat
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
-		while effectproc(BRN,16,3,1) == false do -- Weaken calculation
+		while effectproc(BRN,16,3,1) == false do
 			bcount = bcount+1
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
 		end
-		gui.text(400,165,"GWeaken: " .. bcount)
+		gui.text(400,180,"GWeaken: " .. bcount)
 	end
 
-	if memory.read_u8(0x02000048)>=0x70 and memory.read_u8(0x02000155) < 0x14 then -- If you have mist, return mist information
+	if memory.read_u8(0x02000048)>=0x70 and memory.read_u8(0x02000155) < 0x14 then -- have mist and before getting off boat
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
-		while effectproc(RNA(BRN),24,1,3) == false do --or unleash(BRN) == false do -- mist calculation
+		while effectproc(RNA(BRN),24,1,3) == false do -- or unleash(BRN) == false do -- mist calculation
 			bcount = bcount+1
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
 		end
-		gui.text(400,180,"Mist: " .. bcount)
+		gui.text(400,195,"Mist: " .. bcount)
 	end
 
 	if memory.read_u16_le(0x02000400)==0x1FE and memory.read_u16_le(0x02000404)==0x88 then -- If you are in Colosso return the following calculation
@@ -979,7 +979,7 @@ if nosq == false then -- normal any% probabilities follow from here
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
 		end
-		gui.text(400,195,"Scorch: " .. bcount)
+		gui.text(400,210,"Scorch: " .. bcount)
 	end
 end
 
