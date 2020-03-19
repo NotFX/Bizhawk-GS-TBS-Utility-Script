@@ -379,7 +379,7 @@ function FindDjinniHolder(DjinnName)
 	
 	local BaseAddress = 0x020005F8 + 4*ElementNum
 	for i=0,3 do
-		if bit.band(2^DjinnIndex,memory.readbyte(BaseAddress + 0x14C*i)) ~= 0 then 
+		if bit.band(2^DjinnIndex,memory.read_u8(BaseAddress + 0x14C*i)) ~= 0 then 
 			return i
 		end
 	end
