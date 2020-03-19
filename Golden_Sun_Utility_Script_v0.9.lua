@@ -1,4 +1,7 @@
-local version = (memory.read_u8(0x080000A0) == 0x4F) and "J" or "U"
+local version = (memory.read_u8(0x080000A0) == 0x4F) and "J" or "U" -- check version and set global
+	  JPN = nil
+	  if version == "J" then JPN = 1 else JPN = 0 
+	  end
 
 local AD1 = 0x0200053a -- Isaac PP
 local AD3 = 0x0200047A -- Next Encounter
@@ -194,7 +197,7 @@ local tableState = false
        end
 
        --------------------------------------------------- NEW SHIT STARTS HERE
-       function RNC(R)   -- RN concactenate
+       function RNC(R)   -- RN concatenate
          g = R
          g = bit.lshift(g,8)
          g = bit.band(g,0xFFFFFFFF)
@@ -243,7 +246,7 @@ local tableState = false
            return ColorRateS
          end
 
-         function ModRoll(RNG, modvalue)
+         function ModRoll(RNG, modvalue)  -- for modular 8-cycles
   			return bit.rshift(RNG, 8) % modvalue
 			end
 
@@ -890,15 +893,15 @@ if (memory.read_u8(0x020309a0)) >= 1 then
 
 	function vuln (S)
 		e1Ind = S
-		vuln1 = memory.read_u8(0x08080EC8 + ((e1Ind - 8) * 0x54) + 0x48)
-		vuln2 = memory.read_u8(0x08080EC8 + ((e1Ind - 8) * 0x54) + 0x49)
-		vuln3 = memory.read_u8(0x08080EC8 + ((e1Ind - 8) * 0x54) + 0x4A)
+		vuln1 = memory.read_u8((0x08080EC8 - 0xA000*JPN) + ((e1Ind - 8) * 0x54) + 0x48) -- 0x08080EC8 = U ; 0x08076EC8 = J
+		vuln2 = memory.read_u8((0x08080EC8 - 0xA000*JPN) + ((e1Ind - 8) * 0x54) + 0x49)
+		vuln3 = memory.read_u8((0x08080EC8 - 0xA000*JPN) + ((e1Ind - 8) * 0x54) + 0x4A)
 		return vuln1, vuln2, vuln3
 	end
 
 	function enemy (S,Elm) -- Enemy Elemental Data Table
-	        elemInd = memory.read_u8(0x08080EC8 + ((S - 8) * 0x54) + 0x34)
-	        enemyelmlevel = memory.read_u8(0x08088E38 + (elemInd * 0x18) + 4+Elm)
+	        elemInd = memory.read_u8((0x08080EC8 - 0xA000*JPN) + ((S - 8) * 0x54) + 0x34)
+	        enemyelmlevel = memory.read_u8((0x08080EC8 - 0xA000*JPN) + (elemInd * 0x18) + 4+Elm)
 	        return enemyelmlevel
 	end
 
@@ -927,7 +930,7 @@ if (memory.read_u8(0x020309a0)) >= 1 then
 			else
 			v=00
 		end
-		if memory.read_u8(0x080844EC + (U * 0xB4) + 0x92 + Elm) == 54 then
+		if memory.read_u8((0x080844EC - 0xA000*JPN) + (U * 0xB4) + 0x92 + Elm) == 54 then
 			elmaff = 5
 			else
 			elmaff = 0
@@ -953,13 +956,14 @@ if (memory.read_u8(0x020309a0)) >= 1 then
 		end
 	end
 
-	local	BladeUser = nil	-- Who has [item/djinni]
+
+	local	BladeUser = nil
 	local   WitchUser = nil
 	local	ScorchUser = nil
 	local	MistUser = nil
 
 	
-	if BattleState ~= memory.read_u8(0x020309a0) then
+	if BattleState ~= memory.read_u8(0x020309a0) then -- When entering combat, determine
 		
 	BladeUser = FindItemHolder(0x17)	-- Who has [item/djinni]
 	WitchUser = FindItemHolder(0x39)
@@ -1020,7 +1024,7 @@ if nosq == false then	-- normal any% probabilities follow from here
 		gui.text(400,180,"GWeaken: " .. bcount)
 	end
 
-	if MistUser~=nil and memory.read_u8(0x02000155) < 0x14 then	-- have Mist and before getting off boat
+	if MistUser~=nil and memory.read_u8(0x02000155) < 0x14 then		-- have Mist and before getting off boat
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
 		
@@ -1032,7 +1036,7 @@ if nosq == false then	-- normal any% probabilities follow from here
 		gui.text(400,195,"Mist: " .. bcount)
 	end
 																	-- Navampa Win/Lose is stored at 0200016A
-	if ScorchUser~=nil and memory.read_u8(0x0200016C)~=0x80 then	-- have Scorch and before Colloso ends 
+	if ScorchUser~=nil and memory.read_u8(0x0200016C)~=0x80 then	-- have Scorch and before Colloso ends
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
 		
