@@ -343,6 +343,47 @@ function RNB (R) -- RN Advance and reduce for use in RNG calculations
 
 end
 
+function FindKey(table, value) -- function to help search arrays
+	for k,v in pairs(table) do
+	  if v == value then return k end
+	end
+end
+
+function FindItemHolder(ItemIndex) -- this lets us find out who's wearing a specific item
+	for i=0,3 do
+		for j=0,14 do
+		  if bit.band(2^10-1,memory.read_u16_le(0x020005D8 + 2*j + 0x14C*i))==(0x200 + ItemIndex) then
+			return i
+		  end
+		end
+	end
+end
+
+local   VenusDjinn = {"Flint","Granite","Quartz","Vine","Sap","Ground","Bane"}  -- Array of all TBS Djinn
+local   MercDjinn = {"Fizz","Sleet","Mist","Spritz","Hail","Tonic","Dew"}
+local   MarsDjinn = {"Forge","Fever","Corona","Scorch","Ember","Flash","Torch"}
+local   JupDjinn = {"Gust","Breeze","Zephyr","Smog","Kite","Squall","Luff"}
+
+local   DjinnType = {VenusDjinn,MercDjinn,MarsDjinn,JupDjinn} -- Lets us select the element we need
+
+function FindDjinniHolder(DjinnName)
+	local DjinnIndex, ElementNum
+	for i=1,4 do
+		DjinnIndex = FindKey(DjinnType[i], DjinnName)
+		if DjinnIndex ~= nil then ElementNum = i-1; break; end
+	end
+	DjinnIndex = DjinnIndex - 1
+	
+	local BaseAddress = 0x020005F8 + 4*ElementNum
+	for i=0,3 do
+		if bit.band(2^DjinnIndex,memory.readbyte(BaseAddress + 0x14C*i)) ~= 0 then 
+			return i
+		end
+	end
+end
+
+BattleState = nil
+
 while true do
 keypress = input.get()
 gui.text(0,0,"Frame:"..(emu.framecount()),nil,"bottomleft")
@@ -678,6 +719,7 @@ end
 
 
 if BRN == 0 then	-- reset BRN counter on loadstate
+	
 bstore = BRN
 bcount = 0
 end
@@ -774,6 +816,7 @@ local	isl= memory.read_u8(0x0200050F) 	-- Isaac level
 local	gal= memory.read_u8(0x0200065b) 	-- etc
 local	ivl= memory.read_u8(0x020007a7)
 local	mil= memory.read_u8(0x020008F3)
+
 
 if (memory.read_u8(0x020309a0)) >= 1 then
 
@@ -910,70 +953,42 @@ if (memory.read_u8(0x020309a0)) >= 1 then
 		end
 	end
 
-	function FindKey(table, value) -- function to help search arrays
-		for k,v in pairs(table) do
-		  if v == value then return k end
-		end
-	end
+	local	BladeUser = nil	-- Who has [item/djinni]
+	local   WitchUser = nil
+	local	ScorchUser = nil
+	local	MistUser = nil
 
-	function FindItemHolder(ItemIndex) -- this lets us find out who's wearing a specific item
-		for i=0,3 do
-		    for j=0,14 do
-			  if bit.band(memory.read_u16_le(0x020005D8 + 2*j + 0x14C*i), 2^9 - 1)==ItemIndex then
-				return i
-			  end
-		    end
-		end
-	end
-
-	local   VenusDjinn = {"Flint","Granite","Quartz","Vine","Sap","Ground","Bane"}  -- Array of all TBS Djinn
-	local   MercDjinn = {"Fizz","Sleet","Mist","Spritz","Hail","Tonic","Dew"}
-	local   MarsDjinn = {"Forge","Fever","Corona","Scorch","Ember","Flash","Torch"}
-	local   JupDjinn = {"Gust","Breeze","Zephyr","Smog","Kite","Squall","Luff"}
-
-	local   DjinnType = {VenusDjinn,MercDjinn,MarsDjinn,JupDjinn} -- Lets us select the element we need
-
-	function FindDjinniHolder(DjinnName)
-		local DjinnIndex, ElementNum
-		for i=1,4 do
-			DjinnIndex = FindKey(DjinnType[i], DjinnName)
-			if DjinnIndex ~= nil then ElementNum = i-1; break; end
-		end
-		DjinnIndex = DjinnIndex - 1
+	
+	if BattleState ~= memory.read_u8(0x020309a0) then
 		
-		local BaseAddress = 0x020005F8 + 4*ElementNum
-		for i=0,3 do
-			if bit.band(2^DjinnIndex,memory.readbyte(BaseAddress + 0x14C*i)) ~= 0 then 
-				return i
-			end
-		end
-	end
-
-
-	local	BladeUser = FindItemHolder(17)	-- Who has [item/djinni]
-	local   WitchUser = FindItemHolder(39)
-	local	ScorchUser = FindDjinniHolder("Scorch")
-	local	MistUser = FindDjinniHolder("Mist")
+	BladeUser = FindItemHolder(0x17)	-- Who has [item/djinni]
+	WitchUser = FindItemHolder(0x39)
+	ScorchUser = FindDjinniHolder("Scorch")
+	MistUser = FindDjinniHolder("Mist")
+	
+	battlestate = memory.read_u8(0x020309a0)
+	end	
 
 	  	-- begin BRN calculations for procs
 if nosq == false then	-- normal any% probabilities follow from here
-	if memory.read_u8(0x0200010F) == 0x8A then	-- if past kraken only return A Blade information.
+
+	if  BladeUser ~= nil then	-- if someone has ABlade
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
-
-		while effectproc(RNA(BRN),27,0,BladeUser) == false or unleash(BRN) == false do	-- Blade calculation
-      bcount = bcount+1
+		
+		while effectproc(RNA(BRN),27,0,BladeUser) == false or unleash(BRN) == false do  
+			bcount = bcount+1
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
 		end
 		gui.text(400,150,"ABlade Kill: " .. bcount)
 	end
 
-	if party == 15 and memory.read_u8(0x02000155) < 0x14 then	-- have Mia and before getting off boat
+	if party == 15 and memory.read_u8(0x02000155) < 0x14 and WitchUser ~= nil then	-- have Mia and before getting off boat and someone has WWand
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
-
-		while effectproc(RNA(BRN),23,3,WitchUser) == false or unleash(BRN) == false do	-- WWand calculation
+		
+		while effectproc(RNA(BRN),23,3,WitchUser) == false or unleash(BRN) == false do
 			bcount = bcount+1
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
@@ -985,7 +1000,7 @@ if nosq == false then	-- normal any% probabilities follow from here
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
 
-		while effectproc(BRN,16,3,0) == false do	-- Weaken calculation
+		while effectproc(BRN,16,3,0) == false do
 			bcount = bcount+1
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
@@ -996,7 +1011,7 @@ if nosq == false then	-- normal any% probabilities follow from here
 	if memory.read_u8(0x0200065B) >= 9 and memory.read_u8(0x02000155) < 0x14 then	-- Garet level >= 9 and before getting off boat
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
-		
+
 		while effectproc(BRN,16,3,1) == false do
 			bcount = bcount+1
 			if bcount == 100 then break end
@@ -1005,10 +1020,10 @@ if nosq == false then	-- normal any% probabilities follow from here
 		gui.text(400,180,"GWeaken: " .. bcount)
 	end
 
-	if memory.read_u8(0x02000048)>=0x70 and memory.read_u8(0x02000155) < 0x14 then	-- have Mist and before getting off boat
+	if MistUser~=nil and memory.read_u8(0x02000155) < 0x14 then	-- have Mist and before getting off boat
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
-
+		
 		while effectproc(RNA(BRN),24,1,MistUser) == false do
 			bcount = bcount+1
 			if bcount == 100 then break end
@@ -1016,11 +1031,11 @@ if nosq == false then	-- normal any% probabilities follow from here
 		end
 		gui.text(400,195,"Mist: " .. bcount)
 	end
-																					-- Navampa Win/Lose is stored at 0200016A
-	if memory.read_u8(0x02000404)==0x88 and memory.read_u8(0x0200016C)~=0x80 then	-- have Scorch and before Colloso ends 
+																	-- Navampa Win/Lose is stored at 0200016A
+	if ScorchUser~=nil and memory.read_u8(0x0200016C)~=0x80 then	-- have Scorch and before Colloso ends 
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
-
+		
 		while effectproc(RNA(BRN),23,2,ScorchUser) == false do
 			bcount = bcount+1
 			if bcount == 100 then break end
