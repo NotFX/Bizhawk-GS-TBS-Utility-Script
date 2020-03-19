@@ -984,7 +984,7 @@ if nosq == false then	-- normal any% probabilities follow from here
 		gui.text(400,150,"ABlade Kill: " .. bcount)
 	end
 
-	if party == 15 and memory.read_u8(0x02000155) < 0x14 and WitchUser ~= nil then	-- have Mia and before getting off boat and someone has WWand
+	if WitchUser ~= nil and memory.read_u8(0x02000155) < 0x14 then	-- someone has WWand and before getting off boat
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
 		
