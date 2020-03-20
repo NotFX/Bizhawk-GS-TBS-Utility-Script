@@ -1,7 +1,8 @@
+
 local version = (memory.read_u8(0x080000A0) == 0x4F) and "J" or "U" -- check version and set global
-	  JPN = nil
-	  if version == "J" then JPN = 1 else JPN = 0 
-	  end
+	JPN = nil
+	if version == "J" then JPN = 1 else JPN = 0 
+	end
 
 local AD1 = 0x0200053a -- Isaac PP
 local AD3 = 0x0200047A -- Next Encounter
@@ -103,6 +104,14 @@ local MiaGoals = {{29,173},{23,90},{9,79},{5,37},{7,80}}
 local CurrentGoals = {{0,0},{0,0},{0,0},{0,0},{0,0}}
 
 local StatusMenuOpen = false
+
+function gui.scaledtext (x, y, ...)  -- scales gui elements to emulator screen ratio
+	local borderX = client.borderwidth()
+	local borderY = client.borderheight()
+	local width = client.screenwidth() - 2*borderX
+	local height = client.screenheight() - 2*borderY
+	gui.text(x/240 * width + borderX, y/160 * height + borderY, unpack(arg))
+end
 
 function LevelCalculator(CurrentCharacter)
   CharEXP = memory.read_u32_le(0x02000624+CharMemDiff*CurrentCharacter)
@@ -389,9 +398,9 @@ BattleState = nil
 
 while true do
 keypress = input.get()
-gui.text(0,0,"Frame:"..(emu.framecount()),nil,"bottomleft")
-gui.text(200,00,"BRN: ".. (memory.read_u32_le(AD4)))
-gui.text(200,15,"GRN: ".. (memory.read_u32_le(AD5)))
+gui.scaledtext(0,0,"Frame:"..(emu.framecount()),nil,"bottomleft")
+gui.scaledtext(170,0,"BRN: ".. (memory.read_u32_le(AD4)))
+gui.scaledtext(170,10,"GRN: ".. (memory.read_u32_le(AD5)))
 
 if minorhudlock==false then
 if mem <= 0x2008000 then
@@ -411,12 +420,12 @@ end
 	
 	--show our X,Y coordinates while not in combat or the overworld
 if memory.read_u16_le(0x02000400)~=0x1FE and memory.read_u16_le(0x02000400)~=0x02 then
-gui.text(0,0,"X: " .. string.format("%.6f",(memory.read_u32_le(0x02030ec4)/1000000)),nil,"topright")
-gui.text(0,15,"Y: " .. string.format("%.6f",(memory.read_u32_le(0x02030ecc)/1000000)),nil,"topright")
+gui.scaledtext(120,0,"X: " .. string.format("%.6f",(memory.read_u32_le(0x02030ec4)/1000000)))
+gui.scaledtext(120,10,"Y: " .. string.format("%.6f",(memory.read_u32_le(0x02030ecc)/1000000)))
 end
 
 	--find nonzero
-gui.text(450,0,"Nonzero Tile: " .. memcount,nil,"bottomleft")
+gui.scaledtext(180,0,"Nonzero Tile: " .. memcount,nil,"bottomleft")
 end
 
 -- Attacks First, Caught by Surprise Check
@@ -442,7 +451,7 @@ local SaturosMoveset = {[0] = "HF", "FB", "Atk", "FB", "HF", "Atk", "Erup", "Atk
 local SaturosCycle = ModRoll(RNA(memory.read_u32_le(AD4)), 8)
 
 if memory.read_u8(0x020309A0)==0xA1 then     -- if we are fighting Sleet, show our starting point.
-gui.text(0,250,"Saturos: " .. SaturosMoveset[SaturosCycle] .. "-" .. SaturosMoveset[(SaturosCycle + 1) % 8])
+gui.scaledtext(0,80,"Saturos: " .. SaturosMoveset[SaturosCycle] .. "-" .. SaturosMoveset[(SaturosCycle + 1) % 8])
 end
 
 pc1 = memory.read_u8(0x02000438)
@@ -464,7 +473,7 @@ if memory.read_u16_le(0x02000400) ~= 0x1FE and minorhudlock==false and StatusMen
 	magi=memory.read_u8(0x02000500+0x1C+0x14C*3)
 	mlv=memory.read_u8(0x02000500+0x14C*3+0xF)
 	magilv=-magi+(mlv-10)*4+0x2C -- imperfect levels ups discounting randomly rolled stats on new file
-	gui.text(150,0,"Missing Agi I:" .. iagilv .. " G:" .. gagilv .. " V:" .. vagilv .. " M:" .. magilv,nil,"bottomleft")
+	gui.scaledtext(60,0,"Missing Agi I:" .. iagilv .. " G:" .. gagilv .. " V:" .. vagilv .. " M:" .. magilv,nil,"bottomleft")
 end
 
 		-- begin enemy HP/encounter loops
@@ -487,38 +496,38 @@ if 	memory.read_u8(0x02030368)==0xFF and memory.read_u8(0x02030368+0x02)==0 then
 	if pcag4 >= 1000 then
 	pcag4 = memory.read_u8(0x02000540+0x14C*pc4)
 	end
-	gui.text(0,120,"PC" .. pc1 .. " Agi: " .. pcag1) -- Displays agility of party member pc1
-	gui.text(0,135,"PC" .. pc2 .. " Agi: " .. pcag2)
-	gui.text(0,150,"PC" .. pc3 .. " Agi: " .. pcag3)
-	gui.text(0,165,"PC" .. pc4 .. " Agi: " .. pcag4)
+	gui.scaledtext(0,40,"PC" .. pc1 .. " Agi: " .. pcag1) -- Displays agility of party member pc1
+	gui.scaledtext(0,50,"PC" .. pc2 .. " Agi: " .. pcag2)
+	gui.scaledtext(0,60,"PC" .. pc3 .. " Agi: " .. pcag3)
+	gui.scaledtext(0,70,"PC" .. pc4 .. " Agi: " .. pcag4)
 
 	if memory.read_u8(0x020308B0)>0 then
-		gui.text(140,120, "E1 Agi: " .. memory.read_u8(0x020308B0+0x8)) -- If Enemy 1 has nonzero HP display E1 agility
-		gui.text(260,120, "HP: " .. memory.read_u16_le(0x020308B0))
+		gui.scaledtext(60,40, "E1 Agi: " .. memory.read_u8(0x020308B0+0x8)) -- If Enemy 1 has nonzero HP display E1 agility
+		gui.scaledtext(110,40, "HP: " .. memory.read_u16_le(0x020308B0))
 	else
 	end
 
 	if memory.read_u8(0x020308B0+0x14C)>0 then
-		gui.text(140,135, "E2 Agi: " .. memory.read_u8(0x020308B0+0x8+0x14C))
-		gui.text(260,135, "HP: " .. memory.read_u16_le(0x020308B0+0x14C))
+		gui.scaledtext(60,50, "E2 Agi: " .. memory.read_u8(0x020308B0+0x8+0x14C))
+		gui.scaledtext(110,50, "HP: " .. memory.read_u16_le(0x020308B0+0x14C))
 	else
 	end
 
 	if memory.read_u8(0x020308B0+0x14C*2)>0 then
-		gui.text(140,150, "E3 Agi: " .. memory.read_u8(0x020308B0+0x8+0x14C*2))
-		gui.text(260,150, "HP: " .. memory.read_u16_le(0x020308B0+0x14C*2))
+		gui.scaledtext(60,60, "E3 Agi: " .. memory.read_u8(0x020308B0+0x8+0x14C*2))
+		gui.scaledtext(110,60, "HP: " .. memory.read_u16_le(0x020308B0+0x14C*2))
 	else
 	end
 
 	if memory.read_u8(0x020308B0+0x14C*3)>0 then
-		gui.text(140,165, "E4 Agi: " .. memory.read_u8(0x020308B0+0x8+0x14C*3))
-		gui.text(240,165, "HP: " .. memory.read_u16_le(0x020308B0+0x14C*3))
+		gui.scaledtext(60,70, "E4 Agi: " .. memory.read_u8(0x020308B0+0x8+0x14C*3))
+		gui.scaledtext(110,70, "HP: " .. memory.read_u16_le(0x020308B0+0x14C*3))
 	else
 	end
 
 	if memory.read_u8(0x020308B0+0x14C*4)>0 then
-		gui.text(140,180, "E5 Agi: " .. memory.read_u8(0x020308B0+0x8+0x14C*4))
-		gui.text(260,180, "HP: " .. memory.read_u16_le(0x020308B0+0x14C*4))
+		gui.scaledtext(60,80, "E5 Agi: " .. memory.read_u8(0x020308B0+0x8+0x14C*4))
+		gui.scaledtext(110,80, "HP: " .. memory.read_u16_le(0x020308B0+0x14C*4))
 	else
 	end
 
@@ -530,19 +539,15 @@ local trn={}
 		trn[j]= memory.read_u8(0x02030338+0x10*(j-1)) -- add the character index to the trn array in order
 		if trn[j]==0xFF then -- if user has already acted then do nothing
 			j=j+1
-		else
-			gui.text(310+20*k,105,trn[j]) -- if user hasn't acted then display user in the turn order queue
+			else
+			gui.scaledtext(310+20*k,105,trn[j]) -- if user hasn't acted then display user in the turn order queue
 			j=j+1
 			k=k+1
+			end
 		end
-	end
 
-gui.text(210,105, "Turn Order: ")
-if memory.read_u8(0x020308B0)>0 then -- display enemy 1 HP during fight sequence
-	gui.text(260,120, "E1 HP: " .. memory.read_u16_le(0x020308B0))
-else
-end
-end
+	gui.scaledtext(40,40, "Turn Order: ")
+	end
 
 	-- Agility Bonus Calculator
 if memory.read_u8(0x0203033C-0x50)>0 then
@@ -553,7 +558,7 @@ if memory.read_u8(0x0203033C-0x50)>0 then
 	if l~=15 then
 		pcntag1=(memory.read_u8(0x02030328-0x50+0x10*l+0x04)-memory.read_u8(0x02000BDC+0x14C*(pc1-5)))/memory.read_u8(0x02000BDC+0x14C*(pc1-5))*10000
 		pcntag1= math.floor(pcntag1)/100
-		gui.text(0,135,"PC" .. pc1 .. " Bonus: " .. pcntag1 .. "%")
+		gui.scaledtext(0,90,"PC" .. pc1 .. " Bonus: " .. pcntag1 .. "%")
 	end
 
 	local l=1
@@ -563,7 +568,7 @@ if memory.read_u8(0x0203033C-0x50)>0 then
 	if l~=15 then
 		pcntag2=(memory.read_u8(0x02030328+0x10*l+0x04)-memory.read_u8(0x02000BDC+0x14C*(pc2-5)))/memory.read_u8(0x02000BDC+0x14C*(pc2-5))*10000
 		pcntag2= math.floor(pcntag2)/100
-		gui.text(0,150,"PC" .. pc2 .. " Bonus: " .. pcntag2 .. "%")
+		gui.scaledtext(0,100,"PC" .. pc2 .. " Bonus: " .. pcntag2 .. "%")
 	end
 
 	local l=1
@@ -573,7 +578,7 @@ if memory.read_u8(0x0203033C-0x50)>0 then
 	if l~=15 then
 		pcntag3=(memory.read_u8(0x02030328+0x10*l+0x04)-memory.read_u8(0x02000BDC+0x14C*(pc3-5)))/memory.read_u8(0x02000BDC+0x14C*(pc3-5))*10000
 		pcntag3= math.floor(pcntag3)/100
-		gui.text(0,165,"PC" .. pc3 .. " Bonus: " .. pcntag3 .. "%")
+		gui.scaledtext(0,110,"PC" .. pc3 .. " Bonus: " .. pcntag3 .. "%")
 	end
 
 	if memory.read_u8(0x0200045B)==0 and memory.read_u8(0x0200045C)==0 then
@@ -585,7 +590,7 @@ if memory.read_u8(0x0203033C-0x50)>0 then
 		if l~=15 then
 			pcntag4=(memory.read_u8(0x02030328+0x10*l+0x04)-memory.read_u8(0x02000BDC+0x14C*(pc4-5)))/memory.read_u8(0x02000BDC+0x14C*(pc4-5))*10000
 			pcntag4= math.floor(pcntag4)/100
-			gui.text(0,180,"PC" .. pc4 .. " Bonus: " .. pcntag4 .. "% Roll " .. memory.read_u8(0x02030328+0x10*l+0x04))
+			gui.scaledtext(0,120,"PC" .. pc4 .. " Bonus: " .. pcntag4 .. "% Roll " .. memory.read_u8(0x02030328+0x10*l+0x04))
 		end
 	end
 
@@ -649,10 +654,10 @@ end
  if memory.read_u8(0x020309a0) >= 1 then
 --
  else
- gui.text(0,30,"Encounter: ".. (memory.read_u16_le(AD3)))
- gui.text(0,45,"Isaac PP: ".. (memory.read_u8(0x0200053A)))
- gui.text(200,30,"Rate: ".. NormalisedRate(AD6), ColorRate2)
- gui.text(0,60,"PP Regen: ".. (math.floor((memory.read_u8(0x020301B5))/0xF)))
+ gui.scaledtext(0,20,"Encounter: ".. (memory.read_u16_le(AD3)))
+ gui.scaledtext(0,30,"Isaac PP: ".. (memory.read_u8(0x0200053A)))
+ gui.scaledtext(170,20,"Rate: ".. NormalisedRate(AD6), ColorRate2)
+ gui.scaledtext(0,40,"PP Regen: ".. (math.floor((memory.read_u8(0x020301B5))/0xF)))
  end
 
 -- Encounter Value Increasing if loop
@@ -728,8 +733,8 @@ bcount = 0
 end
 
 		-- Gui display
-gui.text(0,15,"GRN count: " .. gcount)
-gui.text(0,0,"BRN count: " .. brncount)
+gui.scaledtext(0,10,"GRN count: " .. gcount)
+gui.scaledtext(0,0,"BRN count: " .. brncount)
 
 		-- AF/CBS scripts
 		if minorhudlock == false then
@@ -785,8 +790,8 @@ if cbsbrn ~= BRN then
 	cbsbrn = BRN
 end
 
-	gui.text(0,200,"AF  " .. afc1 .. " " .. afc2 .. " " .. afc3)
-	gui.text(0,215,"CBS " .. cbsc1 .. " " .. cbsc2 .. " " .. cbsc3)
+	gui.scaledtext(0,80,"AF  " .. afc1 .. " " .. afc2 .. " " .. afc3)
+	gui.scaledtext(0,90,"CBS " .. cbsc1 .. " " .. cbsc2 .. " " .. cbsc3)
 end
 
 		--necessary information for the following scripts
@@ -866,7 +871,7 @@ if (memory.read_u8(0x020309a0)) >= 1 then
 	RN= RNA(RN)
 	end
 
-	gui.text(400,120,"ACs to Run: " .. count)
+	gui.scaledtext(170,30,"ACs to Run: " .. count)
 
 		-- % Chance to Run
 	if nosq == true then
@@ -883,11 +888,11 @@ if (memory.read_u8(0x020309a0)) >= 1 then
 			fleestore = memory.read_u32_le(AD5)
 			fev = fleepercent/100
 			EV = (fev*1+ math.floor(fev+.20,1)*(1-fev)*2+ math.floor(fev+.40,1)*(1-math.floor(fev+.20,1))*(1-fev)*3+ math.floor(fev+.60,1)*(1-math.floor(fev+.40,1))*(1-math.floor(fev+.20,1))*(1-fev)*4+ math.floor(fev+.80,1)*(1-math.floor(fev+.60,1))*(1-math.floor(fev+.40,1))*(1-math.floor(fev+.20,1))*(1-fev)*5+ (1-math.floor(fev+.80,1))*(1-math.floor(fev+.60,1))*(1-math.floor(fev+.40,1))*(1-math.floor(fev+.20,1))*(1-fev)*6)
-			gui.text(100,30,"Run EV: ".. EV)
-			gui.text(160,30,"Run%: " .. fleepercent)
+			gui.scaledtext(100,30,"Run EV: ".. EV)
+			gui.scaledtext(160,30,"Run%: " .. fleepercent)
 			else
-			gui.text(100,30,"Run EV: ".. EV )
-			gui.text(160,30,"Run%: " .. fleepercent)
+			gui.scaledtext(100,30,"Run EV: ".. EV )
+			gui.scaledtext(160,30,"Run%: " .. fleepercent)
 		end
 	end
 
@@ -985,7 +990,7 @@ if nosq == false then	-- normal any% probabilities follow from here
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
 		end
-		gui.text(400,150,"ABlade Kill: " .. bcount)
+		gui.scaledtext(160,50,"ABlade Kill: " .. bcount)
 	end
 
 	if WitchUser ~= nil and memory.read_u8(0x02000155) < 0x14 then	-- someone has WWand and before getting off boat
@@ -997,7 +1002,7 @@ if nosq == false then	-- normal any% probabilities follow from here
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
 		end
-		gui.text(400,135,"WWand Stun: " .. bcount)
+		gui.scaledtext(160,60,"WWand Stun: " .. bcount)
 	end
 
 	if memory.read_u8(0x0200050F) >= 9 and memory.read_u8(0x02000155) < 0x14 then	-- Isaac level >= 9 and before getting off boat
@@ -1009,7 +1014,7 @@ if nosq == false then	-- normal any% probabilities follow from here
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
 		end
-		gui.text(400,165,"IWeaken: " .. bcount)
+		gui.scaledtext(160,90,"IWeaken: " .. bcount)
 	end
 
 	if memory.read_u8(0x0200065B) >= 9 and memory.read_u8(0x02000155) < 0x14 then	-- Garet level >= 9 and before getting off boat
@@ -1021,7 +1026,7 @@ if nosq == false then	-- normal any% probabilities follow from here
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
 		end
-		gui.text(400,180,"GWeaken: " .. bcount)
+		gui.scaledtext(160,100,"GWeaken: " .. bcount)
 	end
 
 	if MistUser~=nil and memory.read_u8(0x02000155) < 0x14 then		-- have Mist and before getting off boat
@@ -1033,7 +1038,7 @@ if nosq == false then	-- normal any% probabilities follow from here
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
 		end
-		gui.text(400,195,"Mist: " .. bcount)
+		gui.scaledtext(160,70,"Mist: " .. bcount)
 	end
 																	-- Navampa Win/Lose is stored at 0200016A
 	if ScorchUser~=nil and memory.read_u8(0x0200016C)~=0x80 then	-- have Scorch and before Colloso ends
@@ -1045,7 +1050,7 @@ if nosq == false then	-- normal any% probabilities follow from here
 			if bcount == 100 then break end
 			BRN=RNA(BRN)
 		end
-		gui.text(400,210,"Scorch: " .. bcount)
+		gui.scaledtext(160,80,"Scorch: " .. bcount)
 	end
 end
 
@@ -1064,7 +1069,7 @@ end
 					vulcan_success = success/10
 				end
 			end
-			gui.text(160,150,"Vulcan: " .. vulcan_success .. "%")
+			gui.scaledtext(160,150,"Vulcan: " .. vulcan_success .. "%")
 			BRN_tempssss = BRN
 		end
 		if memory.read_u8(0x02000048)>=0x70 and memory.read_u8(0x02000155) < 0x14 then -- If you have mist, return mist information
@@ -1079,7 +1084,7 @@ end
 					mist_success = success/10
 				end
 			end
-			gui.text(160,75,"Mist: " .. mist_success .. "%")
+			gui.scaledtext(160,75,"Mist: " .. mist_success .. "%")
 			BRN_temp = BRN
 		end
 
@@ -1095,7 +1100,7 @@ end
 					scorch_success = success/10
 				end
 			end
-			gui.text(160,90,"Scorch: " .. scorch_success .. "%")
+			gui.scaledtext(160,90,"Scorch: " .. scorch_success .. "%")
 			BRN_temps = BRN
 		end
 
@@ -1111,7 +1116,7 @@ end
 					sleep_success = success/10
 				end
 			end
-			gui.text(160,60,"Sleep: " .. sleep_success .. "%")
+			gui.scaledtext(160,60,"Sleep: " .. sleep_success .. "%")
 			BRN_tempss = BRN
 		end
 
@@ -1127,9 +1132,9 @@ end
 					sleepb_success = success/10
 				end
 			end
-			gui.text(160,120,"SleepB: " .. sleepb_success .. "%")
-			--gui.text(160,90,"TotalB: " .. (100-math.abs(math.floor(1-(1-sleepb_success/100)*(1-sleep_success/100)*(1-mist_success/100)*(1-scorch_success/100)*10000))/100)  .. "%")
-			--gui.text(160,70,"Total: " .. (100+math.floor(1-(1-sleep_success/100)*(1-mist_success/100)*(1-scorch_success/100)*10000)/100)  .. "%")
+			gui.scaledtext(160,120,"SleepB: " .. sleepb_success .. "%")
+			--gui.scaledtext(160,90,"TotalB: " .. (100-math.abs(math.floor(1-(1-sleepb_success/100)*(1-sleep_success/100)*(1-mist_success/100)*(1-scorch_success/100)*10000))/100)  .. "%")
+			--gui.scaledtext(160,70,"Total: " .. (100+math.floor(1-(1-sleep_success/100)*(1-mist_success/100)*(1-scorch_success/100)*10000)/100)  .. "%")
 			BRN_tempsss = BRN
 		end
 
@@ -1143,7 +1148,7 @@ end
 				if bcount == 100 then break end
 				BRN=RNA(BRN)
 				end
-				gui.text(160,75,"Scorch: " .. bcount)
+				gui.scaledtext(160,75,"Scorch: " .. bcount)
 		end
 	end
 
@@ -1178,7 +1183,7 @@ end
 			eindex=memory.read_u16_le(0x020309A0)
 			if eindex == 0x47 or eindex == 0x44 then -- Mole Enemy or Siren
 				A,B= droprate(5)
-			gui.text(180,120, "E1 Turns " .. A .. "|" .. B) -- A=turns without djinn, B=turns with djinn
+			gui.scaledtext(180,120, "E1 Turns " .. A .. "|" .. B) -- A=turns without djinn, B=turns with djinn
 			end
 		end
 
@@ -1186,7 +1191,7 @@ end
 			eindex2=memory.read_u16_le(0x020309A0+0x14C)
 			if eindex2 == 0x47 or eindex == 0x44 then  -- Mole Enemy or Siren
 				A,B= droprate(5)
-			gui.text(180,135, "E2 Turns " .. A .. "|" .. B) -- A=turns without djinn, B=turns with djinn
+			gui.scaledtext(180,135, "E2 Turns " .. A .. "|" .. B) -- A=turns without djinn, B=turns with djinn
 			end
 		end
 
@@ -1194,7 +1199,7 @@ end
 			eindex3=memory.read_u16_le(0x020309A0+2*0x14C)
 			if eindex3 == 0x47 or eindex == 0x44 then -- Mole Enemy or Siren
 				A,B= droprate(5)
-			gui.text(180,150, "E3 Turns " .. A .. "|" .. B) -- A=turns without djinn, B=turns with djinn
+			gui.scaledtext(180,150, "E3 Turns " .. A .. "|" .. B) -- A=turns without djinn, B=turns with djinn
 			end
 		end
 
@@ -1202,7 +1207,7 @@ end
 			eindex4=memory.read_u16_le(0x020309A0+3*0x14C)
 			if eindex4 == 0x47 or eindex == 0x44 then -- Mole Enemy or Siren
 				A,B= droprate(5)
-			gui.text(180,165, "E4 Turns " .. A .. "|" .. B) -- A=turns without djinn, B=turns with djinn
+			gui.scaledtext(180,165, "E4 Turns " .. A .. "|" .. B) -- A=turns without djinn, B=turns with djinn
 			end
 		end
 	end
@@ -1254,23 +1259,23 @@ if state == false and keypress["minus"] == true and keypress["Shift"] == true th
 end
 
 if brnadvancecounter >= 1 then
-	--gui.text(100,100, "BRN advanced by one","#00FF00")
-	gui.text(225,00, "+1","#00FF00")
+	--gui.scaledtext(100,100, "BRN advanced by one","#00FF00")
+	gui.scaledtext(225,00, "+1",0xFF00FF00)
 	brnadvancecounter = brnadvancecounter-1
 end
 if brnreducecounter >= 1 then
-	--gui.text(100,100, "BRN advanced by one","#00FF00")
-	gui.text(225,00, "-1","#FF0000")
+	--gui.scaledtext(100,100, "BRN advanced by one","#00FF00")
+	gui.scaledtext(225,00, "-1",0xFFFF0000)
 	brnreducecounter = brnreducecounter-1
 end
 if grnadvancecounter >= 1 then
-	--gui.text(100,100, "GRN advanced by one","#00FF00")
-	gui.text(225,15, "+1","#00FF00")
+	--gui.scaledtext(100,100, "GRN advanced by one","#00FF00")
+	gui.scaledtext(225,10, "+1",0xFF00FF00)
 	grnadvancecounter = grnadvancecounter-1
 end
 if grnreducecounter >= 1 then
-	--gui.text(100,100, "GRN advanced by one","#00FF00")
-	gui.text(225,15, "-1","#FF0000")
+	--gui.scaledtext(100,100, "GRN advanced by one","#00FF00")
+	gui.scaledtext(225,10, "-1",0xFFFF0000)
 	grnreducecounter = grnreducecounter-1
 end
 
@@ -1431,7 +1436,7 @@ if overlay == true and infight == false then
 	for i=-4,4 do
 	  for j=-4,4 do
 	    cur_tile = tile+0x200*i+0x4*j
-	    gui.text(110+j*15,100+i*15, compress(cur_tile), color(cur_tile))
+	    gui.scaledtext(110+j*15,100+i*15, compress(cur_tile), color(cur_tile))
 			if eventcheck(compress(cur_tile),objectlist) == true then
 				gui.drawLine(108+j*15, 98+i*15, 123+j*15, 98+i*15, 0xFFFFFF00)
 				gui.drawLine(123+j*15, 98+i*15, 123+j*15, 108+i*15, 0xFFFFFF00)
@@ -1472,9 +1477,9 @@ if randomisercounter == 50 then
 	end
 end
 if randomisercounter >= 1 then
-	--gui.text(100,100, "BRN advanced by one","#00FF00")
-	gui.text(225,00, "+" .. brnrandomadvance,"#00FF00")
-	gui.text(225,15, "+" .. grnrandomadvance,"#00FF00")
+	--gui.scaledtext(100,100, "BRN advanced by one","#00FF00")
+	gui.scaledtext(225,00, "+" .. brnrandomadvance,0xFF00FF00)
+	gui.scaledtext(225,10, "+" .. grnrandomadvance,0xFF00FF00)
 	randomisercounter = randomisercounter-1
 end
 
@@ -1493,7 +1498,7 @@ if grnrandomisercounter == 50 then
   end
 end
 if grnrandomisercounter >= 1 then
-  gui.text(225,15, "+" .. grnrandomadvance, "#00FF00")
+  gui.scaledtext(225,10, "+" .. grnrandomadvance, 0xFF00FF00)
   grnrandomisercounter = grnrandomisercounter-1
 end
 --- turn on debug mode
@@ -1566,11 +1571,11 @@ end
 -- This code is the global timer
 if globaltimeron == true then
 	if globaltimerpause == false then
-		gui.text(0,180, "Timer " .. math.floor(globaltimer/60) .. "s")
+		gui.scaledtext(0,120, "Timer " .. math.floor(globaltimer/60) .. "s")
 		globaltimer = globaltimer+1
 	end
 	if globaltimerpause == true then
-		gui.text(0,180, "Timer " .. math.floor(globaltimer/6)/10 .. "s " .. globaltimer .. " frames","#FFFF00")
+		gui.scaledtext(0,120, "Timer " .. math.floor(globaltimer/6)/10 .. "s " .. globaltimer .. " frames","#FFFF00")
 	end
 	if keypress["tab"] == true and globaltimerstate == false then
 		globaltimerstore[3] = globaltimerstore[2]
@@ -1586,13 +1591,13 @@ if globaltimeron == true then
 	end
 	if globaltimerstoretimer >= 1 then
 		if globaltimerstore[1] >= 1 then
-			gui.text(0,135, "Time #1 " .. math.floor(globaltimerstore[1]/6)/10 .. "s " .. globaltimerstore[1] .. " frames","#00FF00")
+			gui.scaledtext(0,90, "Time #1 " .. math.floor(globaltimerstore[1]/6)/10 .. "s " .. globaltimerstore[1] .. " frames","#00FF00")
 		end
 		if globaltimerstore[2] >= 1 then
-			gui.text(0,150, "Time #2 " .. math.floor(globaltimerstore[2]/6)/10 .. "s " .. globaltimerstore[2] .. " frames","#00FF00")
+			gui.scaledtext(0,100, "Time #2 " .. math.floor(globaltimerstore[2]/6)/10 .. "s " .. globaltimerstore[2] .. " frames","#00FF00")
 		end
 		if globaltimerstore[3] >= 1 then
-			gui.text(0,165, "Time #3 " .. math.floor(globaltimerstore[3]/6)/10 .. "s " .. globaltimerstore[3] .. " frames","#00FF00")
+			gui.scaledtext(0,110, "Time #3 " .. math.floor(globaltimerstore[3]/6)/10 .. "s " .. globaltimerstore[3] .. " frames","#00FF00")
 		end
 		globaltimerstoretimer = globaltimerstoretimer - 1
 	end
@@ -1618,13 +1623,13 @@ if memory.read_u8(0x030009A4) == 0x9C and memory.read_u8(0x0200006A) == 0x4 and 
     CurrentGoals = MiaGoals
   end
   -- displays characters base stat value i.e. without class or equipment modifiers
-  gui.text(0,150,CurrentName .. " Level " .. LevelCalculator(CurrentChar))
-  gui.text(0,165, " HP: " .. memory.read_u16_le(BaseHP+CharMemDiff*CurrentChar), StatColor[1])
-  gui.text(0,180, " PP: " .. memory.read_u16_le(BasePP+CharMemDiff*CurrentChar), StatColor[2])
-  gui.text(0,195, " Atk: " .. memory.read_u16_le(BaseAtk+CharMemDiff*CurrentChar), StatColor[3])
-  gui.text(0,210, " Def: " .. memory.read_u16_le(BaseDef+CharMemDiff*CurrentChar), StatColor[4])
-  gui.text(0,225, " Agi: " .. memory.read_u16_le(BaseAgi+CharMemDiff*CurrentChar), StatColor[5])
-  --gui.text(0,160, " Luc: " .. memory.read_u8(BaseLuc+CharMemDiff*CurrentChar), StatColor[6])
+  gui.scaledtext(0,100,CurrentName .. " Level " .. LevelCalculator(CurrentChar))
+  gui.scaledtext(0,110, " HP: " .. memory.read_u16_le(BaseHP+CharMemDiff*CurrentChar), StatColor[1])
+  gui.scaledtext(0,120, " PP: " .. memory.read_u16_le(BasePP+CharMemDiff*CurrentChar), StatColor[2])
+  gui.scaledtext(0,130, " Atk: " .. memory.read_u16_le(BaseAtk+CharMemDiff*CurrentChar), StatColor[3])
+  gui.scaledtext(0,140, " Def: " .. memory.read_u16_le(BaseDef+CharMemDiff*CurrentChar), StatColor[4])
+  gui.scaledtext(0,150, " Agi: " .. memory.read_u16_le(BaseAgi+CharMemDiff*CurrentChar), StatColor[5])
+  --gui.scaledtext(0,160, " Luc: " .. memory.read_u8(BaseLuc+CharMemDiff*CurrentChar), StatColor[6])
 
   -- This code is for stat selection
   if keypress["I"]==true and keypress["K"]==nil and statstate == false then -- moves the highlghted stat up
@@ -1661,16 +1666,16 @@ if memory.read_u8(0x030009A4) == 0x9C and memory.read_u8(0x0200006A) == 0x4 and 
 
 
   -- displays characters base stat value i.e. without class or equipment modifiers
-  gui.text(40,165, " [" .. math.floor((CurrentGoals[1][2]-CurrentGoals[1][1])/20)*LevelCalculator(CurrentChar)+CurrentGoals[1][1] .. "-" .. math.floor((CurrentGoals[1][2]-CurrentGoals[1][1]+19)/20)*LevelCalculator(CurrentChar)+CurrentGoals[1][1] .. "]", StatColor[1])
-  gui.text(40,180, " [" .. math.floor((CurrentGoals[2][2]-CurrentGoals[2][1])/20)*LevelCalculator(CurrentChar)+CurrentGoals[2][1] .. "-" .. math.floor((CurrentGoals[2][2]-CurrentGoals[2][1]+19)/20)*LevelCalculator(CurrentChar)+CurrentGoals[2][1] .. "]", StatColor[2])
-  gui.text(40,195, " [" .. math.floor((CurrentGoals[3][2]-CurrentGoals[3][1])/20)*LevelCalculator(CurrentChar)+CurrentGoals[3][1] .. "-" .. math.floor((CurrentGoals[3][2]-CurrentGoals[3][1]+19)/20)*LevelCalculator(CurrentChar)+CurrentGoals[3][1] .. "]", StatColor[3])
-  gui.text(40,210, " [" .. math.floor((CurrentGoals[4][2]-CurrentGoals[4][1])/20)*LevelCalculator(CurrentChar)+CurrentGoals[4][1] .. "-" .. math.floor((CurrentGoals[4][2]-CurrentGoals[4][1]+19)/20)*LevelCalculator(CurrentChar)+CurrentGoals[4][1] .. "]", StatColor[4])
-  gui.text(40,225, " [" .. math.floor((CurrentGoals[5][2]-CurrentGoals[5][1])/20)*LevelCalculator(CurrentChar)+CurrentGoals[5][1] .. "-" .. math.floor((CurrentGoals[5][2]-CurrentGoals[5][1]+19)/20)*LevelCalculator(CurrentChar)+CurrentGoals[5][1] .. "]", StatColor[5])
-  gui.text(90,165, "E:" .. math.floor((((CurrentGoals[1][2]-CurrentGoals[1][1])/20)*LevelCalculator(CurrentChar)+CurrentGoals[1][1])*10)/10, StatColor[1])
-  gui.text(90,180, "E:" .. math.floor((((CurrentGoals[2][2]-CurrentGoals[2][1])/20)*LevelCalculator(CurrentChar)+CurrentGoals[2][1])*10)/10, StatColor[2])
-  gui.text(90,195, "E:" .. math.floor((((CurrentGoals[3][2]-CurrentGoals[3][1])/20)*LevelCalculator(CurrentChar)+CurrentGoals[3][1])*10)/10, StatColor[3])
-  gui.text(90,210, "E:" .. math.floor((((CurrentGoals[4][2]-CurrentGoals[4][1])/20)*LevelCalculator(CurrentChar)+CurrentGoals[4][1])*10)/10, StatColor[4])
-  gui.text(90,225, "E:" .. math.floor((((CurrentGoals[5][2]-CurrentGoals[5][1])/20)*LevelCalculator(CurrentChar)+CurrentGoals[5][1])*10)/10, StatColor[5])
+  gui.scaledtext(40,110, " [" .. math.floor((CurrentGoals[1][2]-CurrentGoals[1][1])/20)*LevelCalculator(CurrentChar)+CurrentGoals[1][1] .. "-" .. math.floor((CurrentGoals[1][2]-CurrentGoals[1][1]+19)/20)*LevelCalculator(CurrentChar)+CurrentGoals[1][1] .. "]", StatColor[1])
+  gui.scaledtext(40,120, " [" .. math.floor((CurrentGoals[2][2]-CurrentGoals[2][1])/20)*LevelCalculator(CurrentChar)+CurrentGoals[2][1] .. "-" .. math.floor((CurrentGoals[2][2]-CurrentGoals[2][1]+19)/20)*LevelCalculator(CurrentChar)+CurrentGoals[2][1] .. "]", StatColor[2])
+  gui.scaledtext(40,130, " [" .. math.floor((CurrentGoals[3][2]-CurrentGoals[3][1])/20)*LevelCalculator(CurrentChar)+CurrentGoals[3][1] .. "-" .. math.floor((CurrentGoals[3][2]-CurrentGoals[3][1]+19)/20)*LevelCalculator(CurrentChar)+CurrentGoals[3][1] .. "]", StatColor[3])
+  gui.scaledtext(40,140, " [" .. math.floor((CurrentGoals[4][2]-CurrentGoals[4][1])/20)*LevelCalculator(CurrentChar)+CurrentGoals[4][1] .. "-" .. math.floor((CurrentGoals[4][2]-CurrentGoals[4][1]+19)/20)*LevelCalculator(CurrentChar)+CurrentGoals[4][1] .. "]", StatColor[4])
+  gui.scaledtext(40,150, " [" .. math.floor((CurrentGoals[5][2]-CurrentGoals[5][1])/20)*LevelCalculator(CurrentChar)+CurrentGoals[5][1] .. "-" .. math.floor((CurrentGoals[5][2]-CurrentGoals[5][1]+19)/20)*LevelCalculator(CurrentChar)+CurrentGoals[5][1] .. "]", StatColor[5])
+  gui.scaledtext(90,110, "E:" .. math.floor((((CurrentGoals[1][2]-CurrentGoals[1][1])/20)*LevelCalculator(CurrentChar)+CurrentGoals[1][1])*10)/10, StatColor[1])
+  gui.scaledtext(90,120, "E:" .. math.floor((((CurrentGoals[2][2]-CurrentGoals[2][1])/20)*LevelCalculator(CurrentChar)+CurrentGoals[2][1])*10)/10, StatColor[2])
+  gui.scaledtext(90,130, "E:" .. math.floor((((CurrentGoals[3][2]-CurrentGoals[3][1])/20)*LevelCalculator(CurrentChar)+CurrentGoals[3][1])*10)/10, StatColor[3])
+  gui.scaledtext(90,140, "E:" .. math.floor((((CurrentGoals[4][2]-CurrentGoals[4][1])/20)*LevelCalculator(CurrentChar)+CurrentGoals[4][1])*10)/10, StatColor[4])
+  gui.scaledtext(90,150, "E:" .. math.floor((((CurrentGoals[5][2]-CurrentGoals[5][1])/20)*LevelCalculator(CurrentChar)+CurrentGoals[5][1])*10)/10, StatColor[5])
 else
   StatusMenuOpen = false
 end
@@ -1706,7 +1711,7 @@ if encounteranalysisstate == true and keypress["M"]==nil then
 end
 
 if encounteranalysis == true then
-	--gui.text(160,0,"GRN: ".. (memory.read_u32_le(AD5)))
+	--gui.scaledtext(160,0,"GRN: ".. (memory.read_u32_le(AD5)))
 
 
 	-- Encounter Rate Functions
@@ -1763,9 +1768,9 @@ if encounteranalysis == true then
       end
     end
     if memory.read_u16_le(0x02000400)~=0x1FE then
-      gui.text(200,45,moveList[tableVariable])
+      gui.scaledtext(170,30,moveList[tableVariable])
       for i=0,9,1 do
-        gui.text(200,60+15*i,"+".. i .. " Rate " .. RatePredictionVectorStore[i+1][1], RatePredictionVectorStore[i+1][2])
+        gui.scaledtext(170,40+10*i,"+".. i .. " Rate " .. RatePredictionVectorStore[i+1][1], RatePredictionVectorStore[i+1][2])
       end
     end
 end
