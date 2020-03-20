@@ -19,4 +19,4 @@ How to use:
 --------------------
 Original by TL_Plexa
 
-Bizhawk version by Ruadath and Fx
+Bizhawk version by Ruadath, Dyrati, and Fx
