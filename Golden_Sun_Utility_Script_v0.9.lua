@@ -1710,7 +1710,7 @@ if encounteranalysis == true then
 
 
 	-- Encounter Rate Functions
-	  RateRate = bit.band(RatePrediction(memory.read_u32_le(AD5)))
+	  RateRate = RatePrediction(memory.read_u32_le(AD5))
 	  if NewRate ~= RateRate then
 	    OldRate = NewRate
 	    NewRate = RateRate
@@ -1763,9 +1763,9 @@ if encounteranalysis == true then
       end
     end
     if memory.read_u16_le(0x02000400)~=0x1FE then
-      gui.text(160,45,moveList[tableVariable])
+      gui.text(200,45,moveList[tableVariable])
       for i=0,9,1 do
-        gui.text(160,60+15*i,"+".. i .. " Rate " .. RatePredictionVectorStore[i+1][1], RatePredictionVectorStore[i+1][2])
+        gui.text(200,60+15*i,"+".. i .. " Rate " .. RatePredictionVectorStore[i+1][1], RatePredictionVectorStore[i+1][2])
       end
     end
 end
