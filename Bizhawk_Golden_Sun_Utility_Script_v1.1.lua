@@ -399,8 +399,8 @@ BattleState = nil
 while true do
 keypress = input.get()
 gui.scaledtext(0,0,"Frame:"..(emu.framecount()),nil,"bottomleft")
-gui.scaledtext(170,0,"BRN: ".. (memory.read_u32_le(AD4)))
-gui.scaledtext(170,10,"GRN: ".. (memory.read_u32_le(AD5)))
+gui.scaledtext(180,0,"BRN: ".. (memory.read_u32_le(AD4)))
+gui.scaledtext(180,10,"GRN: ".. (memory.read_u32_le(AD5)))
 
 if minorhudlock==false then
 if mem <= 0x2008000 then
@@ -656,7 +656,7 @@ end
  else
  gui.scaledtext(0,20,"Encounter: ".. (memory.read_u16_le(AD3)))
  gui.scaledtext(0,30,"Isaac PP: ".. (memory.read_u8(0x0200053A)))
- gui.scaledtext(170,20,"Rate: ".. NormalisedRate(AD6), ColorRate2)
+ gui.scaledtext(180,20,"Rate: ".. NormalisedRate(AD6), ColorRate2)
  gui.scaledtext(0,40,"PP Regen: ".. (math.floor((memory.read_u8(0x020301B5))/0xF)))
  end
 
@@ -1768,9 +1768,9 @@ if encounteranalysis == true then
       end
     end
     if memory.read_u16_le(0x02000400)~=0x1FE then
-      gui.scaledtext(170,30,moveList[tableVariable])
+      gui.scaledtext(180,30,moveList[tableVariable])
       for i=0,9,1 do
-        gui.scaledtext(170,40+10*i,"+".. i .. " Rate " .. RatePredictionVectorStore[i+1][1], RatePredictionVectorStore[i+1][2])
+        gui.scaledtext(180,40+10*i,"+".. i .. " Rate " .. RatePredictionVectorStore[i+1][1], RatePredictionVectorStore[i+1][2])
       end
     end
 end
