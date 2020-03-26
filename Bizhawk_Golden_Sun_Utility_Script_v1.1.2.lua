@@ -411,23 +411,24 @@ end
 function ModRoll(RNG, modvalue)  -- for modular cycles
     return bit.rshift(RNG, 8) % modvalue
 end
-
+   
 function SaturosCycle(Advances)
-  local StoredBRN = memory.read_u32_le(AD4)
-    for i=0,Advances do
-     StoredBRN = RNA(StoredBRN)
-    end
-  return ModRoll(StoredBRN, 8)
+    return ModRoll(RNA(memory.read_u32_le(AD4),Advances), 8)
 end
-
+   
 local SaturosMoveset = {[0] = "HF", "FB", "Atk", "FB", "HF", "Atk", "Erup", "Atk"}
-
+   
 if memory.read_u8(0x020309A0)==0xA1 then     -- if we are fighting Sleet, show our starting point for several BRN
-gui.scaledtext(160,80,"Saturos +0: " .. SaturosMoveset[SaturosCycle(0)] .. "-" .. SaturosMoveset[(SaturosCycle(0)+1) % 8])
-gui.scaledtext(160,90,"Saturos +1: " .. SaturosMoveset[SaturosCycle(1)] .. "-" .. SaturosMoveset[(SaturosCycle(1)+1) % 8])
-gui.scaledtext(160,100,"Saturos +2: " .. SaturosMoveset[SaturosCycle(2)] .. "-" .. SaturosMoveset[(SaturosCycle(2)+1) % 8])
-gui.scaledtext(160,110,"Saturos +3: " .. SaturosMoveset[SaturosCycle(3)] .. "-" .. SaturosMoveset[(SaturosCycle(3)+1) % 8])
-gui.scaledtext(160,120,"Saturos +4: " .. SaturosMoveset[SaturosCycle(4)] .. "-" .. SaturosMoveset[(SaturosCycle(4)+1) % 8])
+   gui.scaledtext(170,40,"Saturos:")
+   gui.scaledtext(170,50,"-2: " .. SaturosMoveset[SaturosCycle(-2)] .. "-" .. SaturosMoveset[(SaturosCycle(-2)+1) % 8])
+   gui.scaledtext(170,60,"-1: " .. SaturosMoveset[SaturosCycle(-1)] .. "-" .. SaturosMoveset[(SaturosCycle(-1)+1) % 8])
+   gui.scaledtext(170,70,"+0: " .. SaturosMoveset[SaturosCycle(0)] .. "-" .. SaturosMoveset[(SaturosCycle(0)+1) % 8])
+   gui.scaledtext(170,80,"+1: " .. SaturosMoveset[SaturosCycle(1)] .. "-" .. SaturosMoveset[(SaturosCycle(1)+1) % 8])
+   gui.scaledtext(170,90,"+2: " .. SaturosMoveset[SaturosCycle(2)] .. "-" .. SaturosMoveset[(SaturosCycle(2)+1) % 8])
+   gui.scaledtext(170,100,"+3: " .. SaturosMoveset[SaturosCycle(3)] .. "-" .. SaturosMoveset[(SaturosCycle(3)+1) % 8])
+   gui.scaledtext(170,110,"+4: " .. SaturosMoveset[SaturosCycle(4)] .. "-" .. SaturosMoveset[(SaturosCycle(4)+1) % 8])
+   gui.scaledtext(170,120,"+5: " .. SaturosMoveset[SaturosCycle(5)] .. "-" .. SaturosMoveset[(SaturosCycle(5)+1) % 8])
+   gui.scaledtext(170,130,"+6: " .. SaturosMoveset[SaturosCycle(6)] .. "-" .. SaturosMoveset[(SaturosCycle(6)+1) % 8])
 end
 
     -- 
