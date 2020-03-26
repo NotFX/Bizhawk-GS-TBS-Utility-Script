@@ -241,18 +241,7 @@ function RatePrediction(IN)
 end
 
 function RatePsyCalc(IN,ADV)
-    R = IN
-    N = ADV
-    if N >= 0 then
-        for i = 1,N,1 do
-            R = RNA(R)
-        end
-    else
-        N=-N
-        for i = 1,N,1 do
-            R = RNR(R)
-        end
-    end
+    R=RNA(IN,ADV)
     R=RatePrediction(R)
     R=NormalisedRate3(R)
     return R
