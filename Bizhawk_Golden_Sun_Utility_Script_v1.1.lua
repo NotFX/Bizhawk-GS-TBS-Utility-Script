@@ -255,10 +255,6 @@ local tableState = false
            return ColorRateS
          end
 
-         function ModRoll(RNG, modvalue)  -- for modular 8-cycles
-  			return bit.rshift(RNG, 8) % modvalue
-			end
-
          --function PercentRoll(RNG,Percent) 		--unused
  		 	--RNG = bit.band(bit.rshift(RNG,8), 0xFFFF)
  		 	--return bit.rshift(RNG*Percent,16)
@@ -394,7 +390,7 @@ function FindDjinniHolder(DjinnName)
 	end
 end
 
-BattleState = nil
+BattleState = nil -- Encounter detection
 
 while true do
 keypress = input.get()
@@ -437,7 +433,7 @@ function AF (R) -- Attacks First Check, 0 = nothing, 1 = AF, 2 = CBS
 	if bit.band(R1,0xF) == 0 then
 		return 1
 	else
-		if bit.band(R2,0x1F) ==0 then
+		if bit.band(R2,0x1F) == 0 then
 			return 2
 		else
 			return 0
@@ -446,21 +442,38 @@ function AF (R) -- Attacks First Check, 0 = nothing, 1 = AF, 2 = CBS
 end
 
 	-- Cycle-based bossfight calculators follow
-	-- Determine the starting point for the Saturos battle
-local SaturosMoveset = {[0] = "HF", "FB", "Atk", "FB", "HF", "Atk", "Erup", "Atk"}
-local SaturosCycle = ModRoll(RNA(memory.read_u32_le(AD4)), 8)
+    -- Determine the starting point for the Saturos battle
 
-if memory.read_u8(0x020309A0)==0xA1 then     -- if we are fighting Sleet, show our starting point.
-gui.scaledtext(0,80,"Saturos: " .. SaturosMoveset[SaturosCycle] .. "-" .. SaturosMoveset[(SaturosCycle + 1) % 8])
+function ModRoll(RNG, modvalue)  -- for modular cycles
+    return bit.rshift(RNG, 8) % modvalue
 end
 
+function SaturosCycle(Advances)
+  local StoredBRN = memory.read_u32_le(AD4)
+    for i=0,Advances do
+     StoredBRN = RNA(StoredBRN)
+    end
+  return ModRoll(StoredBRN, 8)
+end
+
+local SaturosMoveset = {[0] = "HF", "FB", "Atk", "FB", "HF", "Atk", "Erup", "Atk"}
+
+if memory.read_u8(0x020309A0)==0xA1 then     -- if we are fighting Sleet, show our starting point for several BRN
+gui.scaledtext(160,80,"Saturos +0: " .. SaturosMoveset[SaturosCycle(0)] .. "-" .. SaturosMoveset[(SaturosCycle(0)+1) % 8])
+gui.scaledtext(160,90,"Saturos +1: " .. SaturosMoveset[SaturosCycle(1)] .. "-" .. SaturosMoveset[(SaturosCycle(1)+1) % 8])
+gui.scaledtext(160,100,"Saturos +2: " .. SaturosMoveset[SaturosCycle(2)] .. "-" .. SaturosMoveset[(SaturosCycle(2)+1) % 8])
+gui.scaledtext(160,110,"Saturos +3: " .. SaturosMoveset[SaturosCycle(3)] .. "-" .. SaturosMoveset[(SaturosCycle(3)+1) % 8])
+gui.scaledtext(160,120,"Saturos +4: " .. SaturosMoveset[SaturosCycle(4)] .. "-" .. SaturosMoveset[(SaturosCycle(4)+1) % 8])
+end
+
+	-- 
 pc1 = memory.read_u8(0x02000438)
 pc2 = memory.read_u8(0x02000439)
 pc3 = memory.read_u8(0x0200043A)
 pc4 = memory.read_u8(0x0200043B)
 
 		-- Missing Agility Scripts
-if memory.read_u16_le(0x02000400) ~= 0x1FE and minorhudlock==false and StatusMenuOpen == false then
+if memory.read_u16_le(0x02000400) ~= 0x1FE and minorhudlock == false and StatusMenuOpen == false then
 	iagi=memory.read_u8(0x02000500+0x1C+0x14C*0)
 	ilv=memory.read_u8(0x02000500+0x14C*0+0xF)
 	iagilv=-iagi+(ilv-1)*4+0xC -- imperfect levels ups discounting randomly rolled stats on new file
@@ -993,7 +1006,7 @@ if nosq == false then	-- normal any% probabilities follow from here
 		gui.scaledtext(160,50,"ABlade Kill: " .. bcount)
 	end
 
-	if WitchUser ~= nil and memory.read_u8(0x02000155) < 0x14 then	-- someone has WWand and before getting off boat
+	if Party == 15 and WitchUser ~= nil and memory.read_u8(0x02000155) < 0x14 then	-- someone has WWand and before getting off boat
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
 		
@@ -1029,7 +1042,7 @@ if nosq == false then	-- normal any% probabilities follow from here
 		gui.scaledtext(160,100,"GWeaken: " .. bcount)
 	end
 
-	if MistUser~=nil and memory.read_u8(0x02000155) < 0x14 then		-- have Mist and before getting off boat
+	if MistUser ~= nil and memory.read_u8(0x02000155) < 0x14 then		-- have Mist and before getting off boat
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
 		
@@ -1041,7 +1054,7 @@ if nosq == false then	-- normal any% probabilities follow from here
 		gui.scaledtext(160,70,"Mist: " .. bcount)
 	end
 																	-- Navampa Win/Lose is stored at 0200016A
-	if ScorchUser~=nil and memory.read_u8(0x0200016C)~=0x80 then	-- have Scorch and before Colloso ends
+	if ScorchUser ~= nil and memory.read_u8(0x0200016C)~=0x80 then	-- have Scorch and before Colloso ends
 		BRN = memory.read_u32_le(0x020023A8)
 		bcount=0
 		
