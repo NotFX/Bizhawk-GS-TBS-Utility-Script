@@ -408,9 +408,12 @@ end
 local SaturosMoveset = {[0] = "HF", "FB", "Atk", "FB", "HF", "Atk", "Erup", "Atk"}
    
 if memory.read_u8(0x020309A0)==0xA1 then     -- if we are fighting Sleet, show our starting point for several BRN
-    gui.scaledtext(170,40,"Saturos:")
+gui.scaledtext(170,40,"Saturos:")
     for i=0,8 do
-        gui.scaledtext(170,50 + 10*i, "+" .. tostring(i) .. ": " .. SaturosMoveset[SaturosCycle(i)] .. "-" .. SaturosMoveset[(SaturosCycle(i)+1) % 8])
+        local colour = 0xFFFFFFFF
+        local CycleNum = SaturosCycle(i)
+        if CycleNum == 7 then colour = 0xFF00FF00 elseif CycleNum == 6 then colour = 0xFF0000FF else colour = 0xFFFF0000 end
+            gui.scaledtext(170,50 + 10*i, "+" .. tostring(i) .. ": " .. SaturosMoveset[SaturosCycle(i)] .. "-" .. SaturosMoveset[(SaturosCycle(i)+1) % 8], colour)
     end
 end
 
