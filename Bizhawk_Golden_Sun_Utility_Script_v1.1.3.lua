@@ -408,16 +408,10 @@ end
 local SaturosMoveset = {[0] = "HF", "FB", "Atk", "FB", "HF", "Atk", "Erup", "Atk"}
    
 if memory.read_u8(0x020309A0)==0xA1 then     -- if we are fighting Sleet, show our starting point for several BRN
-   gui.scaledtext(170,40,"Saturos:")
-   gui.scaledtext(170,50,"-2: " .. SaturosMoveset[SaturosCycle(-2)] .. "-" .. SaturosMoveset[(SaturosCycle(-2)+1) % 8])
-   gui.scaledtext(170,60,"-1: " .. SaturosMoveset[SaturosCycle(-1)] .. "-" .. SaturosMoveset[(SaturosCycle(-1)+1) % 8])
-   gui.scaledtext(170,70,"+0: " .. SaturosMoveset[SaturosCycle(0)] .. "-" .. SaturosMoveset[(SaturosCycle(0)+1) % 8])
-   gui.scaledtext(170,80,"+1: " .. SaturosMoveset[SaturosCycle(1)] .. "-" .. SaturosMoveset[(SaturosCycle(1)+1) % 8])
-   gui.scaledtext(170,90,"+2: " .. SaturosMoveset[SaturosCycle(2)] .. "-" .. SaturosMoveset[(SaturosCycle(2)+1) % 8])
-   gui.scaledtext(170,100,"+3: " .. SaturosMoveset[SaturosCycle(3)] .. "-" .. SaturosMoveset[(SaturosCycle(3)+1) % 8])
-   gui.scaledtext(170,110,"+4: " .. SaturosMoveset[SaturosCycle(4)] .. "-" .. SaturosMoveset[(SaturosCycle(4)+1) % 8])
-   gui.scaledtext(170,120,"+5: " .. SaturosMoveset[SaturosCycle(5)] .. "-" .. SaturosMoveset[(SaturosCycle(5)+1) % 8])
-   gui.scaledtext(170,130,"+6: " .. SaturosMoveset[SaturosCycle(6)] .. "-" .. SaturosMoveset[(SaturosCycle(6)+1) % 8])
+    gui.scaledtext(170,40,"Saturos:")
+    for i=0,8 do
+        gui.scaledtext(170,50 + 10*i, "+" .. tostring(i) .. ": " .. SaturosMoveset[SaturosCycle(i)] .. "-" .. SaturosMoveset[(SaturosCycle(i)+1) % 8])
+    end
 end
 
     -- 
