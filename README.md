@@ -16,6 +16,8 @@ How to use:
 
 5)Follow console instructions
 
+Supported plugins can be placed in the same directory as the main script and will be detected automatically.
+
 --------------------
 Original by TL_Plexa
 
