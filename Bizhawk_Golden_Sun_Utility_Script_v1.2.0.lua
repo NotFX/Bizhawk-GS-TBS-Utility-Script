@@ -371,6 +371,7 @@ end
 
 while true do
 keypress = input.get()
+
 gui.scaledtext(0,0,"Frame:"..(emu.framecount()),nil,"bottomleft")
 gui.scaledtext(180,0,"BRN: ".. (memory.read_u32_le(AD4)))
 gui.scaledtext(180,10,"GRN: ".. (memory.read_u32_le(AD5)))
@@ -807,7 +808,7 @@ local    el1 = memory.read_u8(0x02030887)     -- Enemy 1 Level
 local    el2 = memory.read_u8(0x020309d3)     -- etc
 local    el3 = memory.read_u8(0x02030B1F)
 local    el4 = memory.read_u8(0x02030c6b)
-local    party = memory.read_u8(0x02000040)    -- Party member number
+local    Party = memory.read_u8(0x02000040)    -- Party member number
 local    isl= memory.read_u8(0x0200050F)     -- Isaac level
 local    gal= memory.read_u8(0x0200065b)     -- etc
 local    ivl= memory.read_u8(0x020007a7)
@@ -826,9 +827,9 @@ if (memory.read_u8(0x020309a0)) >= 1 then
         ela = el1
     end
 
-    if party == 15 then
+    if Party == 15 then
         ml = (isl+gal+ivl+mil)/4
-    elseif party == 7 then
+    elseif Party == 7 then
         ml = (isl+gal+ivl)/3
     else
         ml = (isl+gal)/2
@@ -948,14 +949,7 @@ if (memory.read_u8(0x020309a0)) >= 1 then
             return false
         end
     end
-
-
-    local    BladeUser = nil
-    local   WitchUser = nil
-    local    ScorchUser = nil
-    local    MistUser = nil
-
-    
+  
     if BattleState ~= memory.read_u8(0x020309a0) then -- When entering combat, determine
         
     BladeUser = FindItemHolder(0x17)    -- Who has [item/djinni]
@@ -963,7 +957,7 @@ if (memory.read_u8(0x020309a0)) >= 1 then
     ScorchUser = FindDjinniHolder("Scorch")
     MistUser = FindDjinniHolder("Mist")
     
-    battlestate = memory.read_u8(0x020309a0)
+    BattleState = memory.read_u8(0x020309a0)
     end    
 
           -- begin BRN calculations for procs
