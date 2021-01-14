@@ -969,7 +969,7 @@ if nosq == false then    -- normal any% probabilities follow from here
         
         while effectproc(RNA(BRN),27,0,BladeUser) == false or unleash(BRN) == false do  
             bcount = bcount+1
-            if bcount == 100 then break end
+            if bcount == 50 then break end
             BRN=RNA(BRN)
         end
         gui.scaledtext(160,50,"ABlade Kill: " .. bcount)
@@ -981,7 +981,7 @@ if nosq == false then    -- normal any% probabilities follow from here
         
         while effectproc(RNA(BRN),23,3,WitchUser) == false or unleash(BRN) == false do
             bcount = bcount+1
-            if bcount == 100 then break end
+            if bcount == 50 then break end
             BRN=RNA(BRN)
         end
         gui.scaledtext(160,60,"WWand Stun: " .. bcount)
@@ -993,7 +993,7 @@ if nosq == false then    -- normal any% probabilities follow from here
 
         while effectproc(BRN,16,3,0) == false do
             bcount = bcount+1
-            if bcount == 100 then break end
+            if bcount == 50 then break end
             BRN=RNA(BRN)
         end
         gui.scaledtext(160,90,"IWeaken: " .. bcount)
@@ -1005,7 +1005,7 @@ if nosq == false then    -- normal any% probabilities follow from here
 
         while effectproc(BRN,16,3,1) == false do
             bcount = bcount+1
-            if bcount == 100 then break end
+            if bcount == 50 then break end
             BRN=RNA(BRN)
         end
         gui.scaledtext(160,100,"GWeaken: " .. bcount)
@@ -1017,7 +1017,7 @@ if nosq == false then    -- normal any% probabilities follow from here
         
         while effectproc(RNA(BRN),24,1,MistUser) == false do
             bcount = bcount+1
-            if bcount == 100 then break end
+            if bcount == 50 then break end
             BRN=RNA(BRN)
         end
         gui.scaledtext(160,70,"Mist: " .. bcount)
@@ -1029,7 +1029,7 @@ if nosq == false then    -- normal any% probabilities follow from here
         
         while effectproc(RNA(BRN),23,2,ScorchUser) == false do
             bcount = bcount+1
-            if bcount == 100 then break end
+            if bcount == 50 then break end
             BRN=RNA(BRN)
         end
         gui.scaledtext(160,80,"Scorch: " .. bcount)
