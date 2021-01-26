@@ -1,3 +1,14 @@
+function unpack_decorator(f) -- redefine unpack to include 0th key in arrays
+    local function inner(array)
+        if array[0] ~= nil then
+            return array[0], f(array)
+        else
+            return f(array)
+        end
+    end
+    return inner
+end
+unpack = unpack_decorator(unpack)
 
 local version = (memory.read_u8(0x080000A0) == 0x4F) and "J" or "U" -- check version and set global
     JPN = nil
@@ -5,7 +16,7 @@ local version = (memory.read_u8(0x080000A0) == 0x4F) and "J" or "U" -- check ver
     end
 
 local AD1 = 0x0200053a -- Isaac PP
-local AD3 = 0x0200047A -- Next Encounter
+local AD3 = 0x02000479 -- Next Encounter
 local AD4 = 0x020023A8 -- Battle RN
 local AD5 = 0x03001CB4 -- General RN
 local AD6 = (0x020301A8) -- Encounter Step Counter
@@ -895,7 +906,7 @@ if (memory.read_u8(0x020309a0)) >= 1 then
 
     function enemy (S,Elm) -- Enemy Elemental Data Table
             elemInd = memory.read_u8((0x08080EC8 - 0xA000*JPN) + ((S - 8) * 0x54) + 0x34)
-            enemyelmlevel = memory.read_u8((0x08080EC8 - 0xA000*JPN) + (elemInd * 0x18) + 4+Elm)
+            enemyelmlevel = memory.read_u8((0x08088E38 - 0xA000*JPN) + (elemInd * 0x18) + 4+Elm)
             return enemyelmlevel
     end
 
@@ -912,7 +923,17 @@ if (memory.read_u8(0x020309a0)) >= 1 then
         return c
     end
 
-    function effectproc (S,E,Elm,U) -- Random number, What effect is this, Elmemental Affinity 0 = Venus, 1 = Mercury, 2= Mars, 3 = Jupiter, 
+    function get_edata(enemyslot) -- Find enemy elemental stats
+        local addr = 0x02030878 + 0x14C*enemyslot + 0x48
+        local epow, eres = {}, {}
+        for i=0,3 do
+            epow[i] = memory.read_u16_le(addr+4*i)
+            eres[i] = memory.read_u16_le(addr+4*i+2)
+        end
+        return epow, eres
+    end
+
+    function effectproc (S,E,Elm,U) -- Random number, What effect is this, Elemental Affinity 0 = Venus, 1 = Mercury, 2= Mars, 3 = Jupiter, 
                                     -- Who is using this 0 = Isaac, 1 = Garet, 2 = Ivan, 3 = Mia
         uelm = memory.read_u8(0x0200061C+U*0x14C+Elm)     -- Elemental Power of User
         eluc = memory.read_u8(0x020308BA)                 -- Enemy Luck
@@ -950,12 +971,16 @@ if (memory.read_u8(0x020309a0)) >= 1 then
         end
     end
   
+    
+    
     if BattleState ~= memory.read_u8(0x020309a0) then -- When entering combat, determine
         
     BladeUser = FindItemHolder(0x17)    -- Who has [item/djinni]
     WitchUser = FindItemHolder(0x39)
     ScorchUser = FindDjinniHolder("Scorch")
     MistUser = FindDjinniHolder("Mist")
+    
+    epow, eres = get_edata(0)
     
     BattleState = memory.read_u8(0x020309a0)
     end    
@@ -969,7 +994,7 @@ if nosq == false then    -- normal any% probabilities follow from here
         
         while effectproc(RNA(BRN),27,0,BladeUser) == false or unleash(BRN) == false do  
             bcount = bcount+1
-            if bcount == 50 then break end
+            if bcount == 100 then break end
             BRN=RNA(BRN)
         end
         gui.scaledtext(160,50,"ABlade Kill: " .. bcount)
@@ -1011,27 +1036,33 @@ if nosq == false then    -- normal any% probabilities follow from here
         gui.scaledtext(160,100,"GWeaken: " .. bcount)
     end
 
-    if MistUser ~= nil and memory.read_u8(0x02000155) < 0x14 then        -- have Mist and before getting off boat
-        BRN = memory.read_u32_le(0x020023A8)
+    if MistUser ~= nil and memory.read_u8(0x0200016C)~=0x80 then        -- Navampa Win/Lose is stored at 0200016A
+        BRN = memory.read_u32_le(0x020023A8)                            -- have Mist and before Colloso ends
         bcount=0
         
-        while effectproc(RNA(BRN),24,1,MistUser) == false do
-            bcount = bcount+1
-            if bcount == 50 then break end
-            BRN=RNA(BRN)
-        end
+        if eres[1] == math.min(unpack(eres)) then BRN = RNA(BRN) end
+
+            while effectproc(BRN,24,1,MistUser) == false do
+                bcount = bcount+1
+                if bcount == 50 then break end
+                BRN=RNA(BRN)
+            end
+        
         gui.scaledtext(160,70,"Mist: " .. bcount)
     end
-                                                                    -- Navampa Win/Lose is stored at 0200016A
-    if ScorchUser ~= nil and memory.read_u8(0x0200016C)~=0x80 then    -- have Scorch and before Colloso ends
+                                                                    
+    if ScorchUser ~= nil and memory.read_u8(0x0200016C)~=0x80 then    
         BRN = memory.read_u32_le(0x020023A8)
         bcount=0
         
-        while effectproc(RNA(BRN),23,2,ScorchUser) == false do
-            bcount = bcount+1
-            if bcount == 50 then break end
-            BRN=RNA(BRN)
-        end
+        if eres[2] == math.min(unpack(eres)) then BRN = RNA(BRN) end
+
+            while effectproc(BRN,23,2,ScorchUser) == false do
+                bcount = bcount+1
+                if bcount == 50 then break end
+                BRN=RNA(BRN)
+            end
+        
         gui.scaledtext(160,80,"Scorch: " .. bcount)
     end
 end
