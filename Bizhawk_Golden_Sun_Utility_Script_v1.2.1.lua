@@ -1786,8 +1786,8 @@ if encounteranalysis == true then
     end
 end
 
-if MapDataCheck == true then -- if MapData plugin is installed then
-  if keypress["Shift"] == true and keypress["D"] == true and prevkeypress["D"] ~= true then -- if combination is pressed, run MapData
+if MapDataCheck == true and bit.band(bit.rshift(memory.readbyte(0x02000060),3),1) ~= 1 then -- if MapData plugin is installed then
+    if keypress["Shift"] == true and keypress["D"] == true and prevkeypress["D"] ~= true then -- if combination is pressed, run MapData
 
     function compress(S) -- dependencies for MapData
         R = bit.rshift(memory.read_u32_le(S),16)
