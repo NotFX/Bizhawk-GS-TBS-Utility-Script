@@ -970,200 +970,206 @@ if (memory.read_u8(0x020309a0)) >= 1 then
             return false
         end
     end
-  
-    
     
     if BattleState ~= memory.read_u8(0x020309a0) then -- When entering combat, determine
+        BladeUser = FindItemHolder(0x17)    -- Who has [item/djinni]
+        WitchUser = FindItemHolder(0x39)
+        ScorchUser = FindDjinniHolder("Scorch")
+        MistUser = FindDjinniHolder("Mist")
         
-    BladeUser = FindItemHolder(0x17)    -- Who has [item/djinni]
-    WitchUser = FindItemHolder(0x39)
-    ScorchUser = FindDjinniHolder("Scorch")
-    MistUser = FindDjinniHolder("Mist")
-    
-    epow, eres = get_edata(0)
-    
-    BattleState = memory.read_u8(0x020309a0)
-    end    
-
-          -- begin BRN calculations for procs
-if nosq == false then    -- normal any% probabilities follow from here
-
-    if  BladeUser ~= nil then    -- if someone has ABlade
-        BRN = memory.read_u32_le(0x020023A8)
-        bcount=0
-        
-        while effectproc(RNA(BRN),27,0,BladeUser) == false or unleash(BRN) == false do  
-            bcount = bcount+1
-            if bcount == 100 then break end
-            BRN=RNA(BRN)
-        end
-        gui.scaledtext(160,50,"ABlade Kill: " .. bcount)
+        epow, eres = get_edata(0)
+        battle_display = {}
+        previous_brn = nil
+        BattleState = memory.read_u8(0x020309a0)
     end
 
-    if Party == 15 and WitchUser ~= nil and memory.read_u8(0x02000155) < 0x14 then    -- someone has WWand and before getting off boat
-        BRN = memory.read_u32_le(0x020023A8)
-        bcount=0
+    if previous_brn ~= memory.read_u32_le(0x020023A8) then
+        previous_brn = memory.read_u32_le(0x020023A8)
+        for i=1,#battle_display do battle_display[i] = nil end
         
-        while effectproc(RNA(BRN),23,3,WitchUser) == false or unleash(BRN) == false do
-            bcount = bcount+1
-            if bcount == 50 then break end
-            BRN=RNA(BRN)
-        end
-        gui.scaledtext(160,60,"WWand Stun: " .. bcount)
-    end
+            -- begin BRN calculations for procs
+        if nosq == false then    -- normal any% probabilities follow from here
 
-    if memory.read_u8(0x0200050F) >= 9 and memory.read_u8(0x02000155) < 0x14 then    -- Isaac level >= 9 and before getting off boat
-        BRN = memory.read_u32_le(0x020023A8)
-        bcount=0
-
-        while effectproc(BRN,16,3,0) == false do
-            bcount = bcount+1
-            if bcount == 50 then break end
-            BRN=RNA(BRN)
-        end
-        gui.scaledtext(160,90,"IWeaken: " .. bcount)
-    end
-
-    if memory.read_u8(0x0200065B) >= 9 and memory.read_u8(0x02000155) < 0x14 then    -- Garet level >= 9 and before getting off boat
-        BRN = memory.read_u32_le(0x020023A8)
-        bcount=0
-
-        while effectproc(BRN,16,3,1) == false do
-            bcount = bcount+1
-            if bcount == 50 then break end
-            BRN=RNA(BRN)
-        end
-        gui.scaledtext(160,100,"GWeaken: " .. bcount)
-    end
-
-    if MistUser ~= nil and memory.read_u8(0x0200016C)~=0x80 then        -- Navampa Win/Lose is stored at 0200016A
-        BRN = memory.read_u32_le(0x020023A8)                            -- have Mist and before Colloso ends
-        bcount=0
-        
-        if eres[1] == math.min(unpack(eres)) then BRN = RNA(BRN) end
-
-            while effectproc(BRN,24,1,MistUser) == false do
-                bcount = bcount+1
-                if bcount == 50 then break end
-                BRN=RNA(BRN)
+            if  BladeUser ~= nil then    -- if someone has ABlade
+                BRN = memory.read_u32_le(0x020023A8)
+                bcount=0
+                
+                while effectproc(RNA(BRN),27,0,BladeUser) == false or unleash(BRN) == false do  
+                    bcount = bcount+1
+                    if bcount == 100 then break end
+                    BRN=RNA(BRN)
+                end
+                table.insert(battle_display, {160,50,"ABlade Kill: " .. bcount})
             end
-        
-        gui.scaledtext(160,70,"Mist: " .. bcount)
-    end
-                                                                    
-    if ScorchUser ~= nil and memory.read_u8(0x0200016C)~=0x80 then    
-        BRN = memory.read_u32_le(0x020023A8)
-        bcount=0
-        
-        if eres[2] == math.min(unpack(eres)) then BRN = RNA(BRN) end
 
-            while effectproc(BRN,23,2,ScorchUser) == false do
-                bcount = bcount+1
-                if bcount == 50 then break end
-                BRN=RNA(BRN)
+            if Party == 15 and WitchUser ~= nil then    -- someone has WWand and before getting off boat
+                BRN = memory.read_u32_le(0x020023A8)
+                bcount=0
+                
+                while effectproc(RNA(BRN),23,3,WitchUser) == false or unleash(BRN) == false do
+                    bcount = bcount+1
+                    if bcount == 50 then break end
+                    BRN=RNA(BRN)
+                end
+                table.insert(battle_display, {160,60,"WWand Stun: " .. bcount})
             end
-        
-        gui.scaledtext(160,80,"Scorch: " .. bcount)
-    end
-end
 
-    if nosq == true then
-        if memory.read_u8(0x020309A0)==0x79 then -- If in Kraken fight, return Vulcan Axe stun chances
-            BRN = memory.read_u32_le(0x020023A8)
-            success = 0
-            if BRN_tempssss ~= BRN then
-                for i=1,1000 do -- mist calculation
-                    if unleash(BRN_tempssss) == true then
-                        if effectproc(RNA(BRN_tempssss),24,2,1) == true then
+            if memory.read_u8(0x0200050F) >= 9 and memory.read_u8(0x02000155) < 0x14 then    -- Isaac level >= 9 and before getting off boat
+                BRN = memory.read_u32_le(0x020023A8)
+                bcount=0
+
+                while effectproc(BRN,16,3,0) == false do
+                    bcount = bcount+1
+                    if bcount == 50 then break end
+                    BRN=RNA(BRN)
+                end
+                table.insert(battle_display, {160,90,"IWeaken: " .. bcount})
+            end
+
+            if memory.read_u8(0x0200065B) >= 9 and memory.read_u8(0x02000155) < 0x14 then    -- Garet level >= 9 and before getting off boat
+                BRN = memory.read_u32_le(0x020023A8)
+                bcount=0
+
+                while effectproc(BRN,16,3,1) == false do
+                    bcount = bcount+1
+                    if bcount == 50 then break end
+                    BRN=RNA(BRN)
+                end
+                table.insert(battle_display, {160,100,"GWeaken: " .. bcount})
+            end
+
+            if MistUser ~= nil and memory.read_u8(0x0200016C)~=0x80 then        -- Navampa Win/Lose is stored at 0200016A
+                BRN = memory.read_u32_le(0x020023A8)                            -- have Mist and before Colloso ends
+                bcount=0
+                
+                if eres[1] == math.min(unpack(eres)) then BRN = RNA(BRN) end
+
+                    while effectproc(BRN,24,1,MistUser) == false do
+                        bcount = bcount+1
+                        if bcount == 50 then break end
+                        BRN=RNA(BRN)
+                    end
+                table.insert(battle_display, {160,70,"Mist: " .. bcount})
+            end
+                                                                            
+            if ScorchUser ~= nil and memory.read_u8(0x0200016C)~=0x80 then    
+                BRN = memory.read_u32_le(0x020023A8)
+                bcount=0
+                
+                if eres[2] == math.min(unpack(eres)) then BRN = RNA(BRN) end
+
+                    while effectproc(BRN,23,2,ScorchUser) == false do
+                        bcount = bcount+1
+                        if bcount == 50 then break end
+                        BRN=RNA(BRN)
+                    end
+                table.insert(battle_display, {160,80,"Scorch: " .. bcount})
+            end
+        end
+
+        if nosq == true then
+            if memory.read_u8(0x020309A0)==0x79 then -- If in Kraken fight, return Vulcan Axe stun chances
+                BRN = memory.read_u32_le(0x020023A8)
+                success = 0
+                if BRN_tempssss ~= BRN then
+                    for i=1,1000 do -- mist calculation
+                        if unleash(BRN_tempssss) == true then
+                            if effectproc(RNA(BRN_tempssss),24,2,1) == true then
+                                success = success + 1
+                            end
+                        end
+                        BRN_tempssss=RNA(BRN_tempssss)
+                        vulcan_success = success/10
+                    end
+                end
+                table.insert(battle_display, {160,150,"Vulcan: " .. vulcan_success .. "%"})
+                BRN_tempssss = BRN
+            end
+            if memory.read_u8(0x02000048)>=0x70 and memory.read_u8(0x02000155) < 0x14 then -- If you have mist, return mist information
+                BRN = memory.read_u32_le(0x020023A8)
+                success = 0
+                if BRN_temp ~= BRN then
+                    for i=1,1000 do -- mist calculation
+                        if effectproc(RNA(BRN_temp),24,1,0) == true then
                             success = success + 1
                         end
+                        BRN_temp=RNA(BRN_temp)
+                        mist_success = success/10
                     end
-                    BRN_tempssss=RNA(BRN_tempssss)
-                    vulcan_success = success/10
                 end
+                table.insert(battle_display, {160,75,"Mist: " .. mist_success .. "%"})
+                BRN_temp = BRN
             end
-            gui.scaledtext(160,150,"Vulcan: " .. vulcan_success .. "%")
-            BRN_tempssss = BRN
-        end
-        if memory.read_u8(0x02000048)>=0x70 and memory.read_u8(0x02000155) < 0x14 then -- If you have mist, return mist information
-            BRN = memory.read_u32_le(0x020023A8)
-            success = 0
-            if BRN_temp ~= BRN then
-                for i=1,1000 do -- mist calculation
-                    if effectproc(RNA(BRN_temp),24,1,0) == true then
-                        success = success + 1
+
+            if memory.read_u8(0x020309A0)==0x79 then -- If in the Kraken fight, do the scorch calc
+                BRN = memory.read_u32_le(0x020023A8)
+                success = 0
+                if BRN_temps ~= BRN then
+                    for i=1,1000 do -- mist calculation
+                        if effectproc(RNA(BRN_temps),23,2,1) == true then
+                            success = success + 1
+                        end
+                        BRN_temps=RNA(BRN_temps)
+                        scorch_success = success/10
                     end
-                    BRN_temp=RNA(BRN_temp)
-                    mist_success = success/10
                 end
+                table.insert(battle_display, {160,90,"Scorch: " .. scorch_success .. "%"})
+                BRN_temps = BRN
             end
-            gui.scaledtext(160,75,"Mist: " .. mist_success .. "%")
-            BRN_temp = BRN
-        end
 
-        if memory.read_u8(0x020309A0)==0x79 then -- If in the Kraken fight, do the scorch calc
-            BRN = memory.read_u32_le(0x020023A8)
-            success = 0
-            if BRN_temps ~= BRN then
-                for i=1,1000 do -- mist calculation
-                    if effectproc(RNA(BRN_temps),23,2,1) == true then
-                        success = success + 1
+            if memory.read_u16_le(0x020008BC) >= 2150 then -- If Ivan level 9, do the sleep calc
+                BRN = memory.read_u32_le(0x020023A8)
+                success = 0
+                if BRN_tempss ~= BRN then
+                    for i=1,1000 do -- mist calculation
+                        if effectproc(RNA(BRN_tempss),24,3,2) == true then
+                            success = success + 1
+                        end
+                        BRN_tempss=RNA(BRN_tempss)
+                        sleep_success = success/10
                     end
-                    BRN_temps=RNA(BRN_temps)
-                    scorch_success = success/10
                 end
+                table.insert(battle_display, {160,60,"Sleep: " .. sleep_success .. "%"})
+                BRN_tempss = BRN
             end
-            gui.scaledtext(160,90,"Scorch: " .. scorch_success .. "%")
-            BRN_temps = BRN
-        end
 
-        if memory.read_u16_le(0x020008BC) >= 2150 then -- If Ivan level 9, do the sleep calc
-            BRN = memory.read_u32_le(0x020023A8)
-            success = 0
-            if BRN_tempss ~= BRN then
-                for i=1,1000 do -- mist calculation
-                    if effectproc(RNA(BRN_tempss),24,3,2) == true then
-                        success = success + 1
+            if memory.read_u8(0x020309A0)==0x79 then -- If in the Kraken fight, do the sleep bomb calc
+                BRN = memory.read_u32_le(0x020023A8)
+                success = 0
+                if BRN_tempsss ~= BRN then
+                    for i=1,1000 do -- mist calculation
+                        if effectproc(RNA(BRN_tempsss),24,3,3) == true then
+                            success = success + 1
+                        end
+                        BRN_tempsss=RNA(BRN_tempsss)
+                        sleepb_success = success/10
                     end
-                    BRN_tempss=RNA(BRN_tempss)
-                    sleep_success = success/10
                 end
+                table.insert(battle_display, {})
+                --gui.scaledtext(160,90,"TotalB: " .. (100-math.abs(math.floor(1-(1-sleepb_success/100)*(1-sleep_success/100)*(1-mist_success/100)*(1-scorch_success/100)*10000))/100)  .. "%")
+                --gui.scaledtext(160,70,"Total: " .. (100+math.floor(1-(1-sleep_success/100)*(1-mist_success/100)*(1-scorch_success/100)*10000)/100)  .. "%")
+                BRN_tempsss = BRN
             end
-            gui.scaledtext(160,60,"Sleep: " .. sleep_success .. "%")
-            BRN_tempss = BRN
-        end
 
-        if memory.read_u8(0x020309A0)==0x79 then -- If in the Kraken fight, do the sleep bomb calc
-            BRN = memory.read_u32_le(0x020023A8)
-            success = 0
-            if BRN_tempsss ~= BRN then
-                for i=1,1000 do -- mist calculation
-                    if effectproc(RNA(BRN_tempsss),24,3,3) == true then
-                        success = success + 1
-                    end
-                    BRN_tempsss=RNA(BRN_tempsss)
-                    sleepb_success = success/10
+            if memory.read_u16_le(0x02000400)==0x1FE and memory.read_u16_le(0x02000404)==0x88 then -- If you are in Colosso return the following calculation
+
+                BRN = memory.read_u32_le(0x020023A8)
+                bcount=0
+
+                while effectproc(RNA(BRN),23,2,0) == false do --or unleash(BRN) == false do -- mist calculation
+                    bcount = bcount+1
+                    if bcount == 100 then break end
+                    BRN=RNA(BRN)
                 end
+                table.insert(battle_display, {160,75,"Scorch: " .. bcount})
             end
-            gui.scaledtext(160,120,"SleepB: " .. sleepb_success .. "%")
-            --gui.scaledtext(160,90,"TotalB: " .. (100-math.abs(math.floor(1-(1-sleepb_success/100)*(1-sleep_success/100)*(1-mist_success/100)*(1-scorch_success/100)*10000))/100)  .. "%")
-            --gui.scaledtext(160,70,"Total: " .. (100+math.floor(1-(1-sleep_success/100)*(1-mist_success/100)*(1-scorch_success/100)*10000)/100)  .. "%")
-            BRN_tempsss = BRN
-        end
-
-        if memory.read_u16_le(0x02000400)==0x1FE and memory.read_u16_le(0x02000404)==0x88 then -- If you are in Colosso return the following calculation
-
-            BRN = memory.read_u32_le(0x020023A8)
-            bcount=0
-
-            while effectproc(RNA(BRN),23,2,0) == false do --or unleash(BRN) == false do -- mist calculation
-                bcount = bcount+1
-                if bcount == 100 then break end
-                BRN=RNA(BRN)
-                end
-                gui.scaledtext(160,75,"Scorch: " .. bcount)
         end
     end
+
+    for i=1,#battle_display do
+        gui.scaledtext(unpack(battle_display[i]))
+    end
+
 
 function itemdrop(S,C)
     g = S
