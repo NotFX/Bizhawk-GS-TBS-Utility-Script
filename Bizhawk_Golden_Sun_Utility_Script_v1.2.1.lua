@@ -855,7 +855,7 @@ if (memory.read_u8(0x020309a0)) >= 1 then
         g = RNB(g)*10000
         fl = 5000 + (2000*fleeFail) + (LevelAve * 500)
         g = bit.rshift(g, 16)
-        if fl >= g then
+        if fl > g then
             return true
         else
             return false
