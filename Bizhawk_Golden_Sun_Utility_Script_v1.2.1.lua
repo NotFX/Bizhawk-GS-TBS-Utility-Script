@@ -405,6 +405,7 @@ end
     
     --show our X,Y coordinates while not in combat or the overworld
 if memory.read_u16_le(0x02000400)~=0x1FE and memory.read_u16_le(0x02000400)~=0x02 then
+gui.scaledtext(80,20,"Tile Address: 0x".. string.format("%x",tile))
 gui.scaledtext(120,0,"X: " .. string.format("%.6f",(memory.read_u32_le(0x02030ec4)/1000000)))
 gui.scaledtext(120,10,"Y: " .. string.format("%.6f",(memory.read_u32_le(0x02030ecc)/1000000)))
 end
@@ -658,6 +659,10 @@ end
  gui.scaledtext(0,30,"Isaac PP: ".. (memory.read_u8(0x0200053A)))
  gui.scaledtext(180,20,"Rate: ".. NormalisedRate(AD6), ColorRate2)
  gui.scaledtext(0,40,"PP Regen: ".. (math.floor((memory.read_u8(0x020301B5))/0xF)))
+ 
+    if memory.read_u16_le(0x02000486) > 0 then
+    gui.scaledtext(0,50,"Avoid Counter: " .. (memory.read_u16_le(0x02000486)))
+    end
  end
 
 -- Encounter Value Increasing if loop
@@ -790,8 +795,8 @@ if cbsbrn ~= BRN then
     cbsbrn = BRN
 end
 
-    gui.scaledtext(0,80,"AF  " .. afc1 .. " " .. afc2 .. " " .. afc3)
-    gui.scaledtext(0,90,"CBS " .. cbsc1 .. " " .. cbsc2 .. " " .. cbsc3)
+    gui.scaledtext(70,0,"AF  " .. afc1 .. " " .. afc2 .. " " .. afc3)
+    gui.scaledtext(70,10,"CBS " .. cbsc1 .. " " .. cbsc2 .. " " .. cbsc3)
 end
 
         --necessary information for the following scripts
@@ -816,19 +821,62 @@ end
 
         -- Begin Flee/Assassinate Scripts
 local    el1 = memory.read_u8(0x02030887)     -- Enemy 1 Level
-local    el2 = memory.read_u8(0x020309d3)     -- etc
+local    el2 = memory.read_u8(0x020309D3)     -- etc
 local    el3 = memory.read_u8(0x02030B1F)
-local    el4 = memory.read_u8(0x02030c6b)
+local    el4 = memory.read_u8(0x02030C6B)
 local    Party = memory.read_u8(0x02000040)    -- Party member number
 local    isl= memory.read_u8(0x0200050F)     -- Isaac level
-local    gal= memory.read_u8(0x0200065b)     -- etc
-local    ivl= memory.read_u8(0x020007a7)
+local    gal= memory.read_u8(0x0200065B)     -- etc
+local    ivl= memory.read_u8(0x020007A7)
 local    mil= memory.read_u8(0x020008F3)
 
 
 if (memory.read_u8(0x020309a0)) >= 1 then
 
-    if el4 ~= 0 then
+    function is_alive(F)
+        local CurrentHP = memory.read_u16_le(0x02000538 + 0x14C * F)
+        if CurrentHP > 0 then return true else return false end
+    end
+    
+    function get_level(F)
+        return memory.read_u8(0x0200050F + 0x14C * F)
+    end
+
+    function is_member(F)
+        local party_flags = memory.read_u8(0x02000040)
+        check = bit.band(party_flags, 2^F)
+        if check then return true else return false end
+    end
+
+    function filter(array, callback)
+        local out = {}
+        for k,v in pairs(array) do
+            if callback(v) then out[k] = v end
+        end
+        return out
+    end
+
+    function map(array, callback)
+        local out = {}
+        for k,v in pairs(array) do
+            out[k] = callback(v)
+        end
+        return out
+    end
+    
+    function sum(array)
+        local out = 0
+        for i,v in ipairs(array) do
+            out = out + v
+        end
+        return out
+    end
+
+    party = filter({0, 1, 2, 3}, is_member) -- what is our current party
+    live_party = filter(party, is_alive)    -- check living members
+    levels = map(live_party, get_level)     -- check living member levels
+
+    if el4 ~= 0 then -- enemy level averages
         ela = (el1+el2+el3+el4)/4
     elseif el3 ~=0 then
         ela = (el1+el2+el3)/3
@@ -838,15 +886,7 @@ if (memory.read_u8(0x020309a0)) >= 1 then
         ela = el1
     end
 
-    if Party == 15 then
-        ml = (isl+gal+ivl+mil)/4
-    elseif Party == 7 then
-        ml = (isl+gal+ivl)/3
-    else
-        ml = (isl+gal)/2
-    end
-
-    LevelAve = ml-ela
+    LevelAve = sum(levels)/#levels - ela
 
     fleeFail = memory.read_u8(0x02030092)
 
@@ -1002,7 +1042,7 @@ if (memory.read_u8(0x020309a0)) >= 1 then
                 table.insert(battle_display, {160,50,"ABlade Kill: " .. bcount})
             end
 
-            if Party == 15 and WitchUser ~= nil then    -- someone has WWand and before getting off boat
+            if Party == 15 and WitchUser ~= nil and memory.read_u8(0x02000155) < 0x14 then    -- someone has WWand and before getting off boat
                 BRN = memory.read_u32_le(0x020023A8)
                 bcount=0
                 
@@ -1247,20 +1287,20 @@ if state == false and keypress["N"] == true and keypress["Shift"] == true then
     bstore = memory.read_u32_le(AD4)
     brncount = brncount - 1
 end
-if state == false and keypress["G"] == true and keypress["Shift"] == true then -- remove the shift condition is two buttons are annoying
+if state == false and keypress["G"] == true and keypress["Shift"] == true then
     memory.write_u32_le(AD5,RNA(memory.read_u32_le(AD5)))
     grnadvancecounter = 30
     state = true
 end
 
-    if state == false and keypress["H"] == true and keypress["Shift"] == true then -- remove the shift condition is two buttons are annoying
+    if state == false and keypress["H"] == true and keypress["Shift"] == true then
         memory.write_u32_le(AD5,RNA(memory.read_u32_le(AD5), -1))
         grnreducecounter = 30
         state = true
         store = memory.read_u32_le(AD5)
         gcount = gcount - 1
     end
-if state == false and keypress["plus"] == true and keypress["Shift"] == true then -- remove the shift condition is two buttons are annoying
+if state == false and keypress["plus"] == true and keypress["Shift"] == true then
     --if memory.read_u32_le(AD5) == 0x80000000 then
     --    memory.write_u32_le(AD5,0)
     --end
@@ -1268,7 +1308,7 @@ if state == false and keypress["plus"] == true and keypress["Shift"] == true the
     grnadvancecounter = 30
     state = true
 end
-if state == false and keypress["minus"] == true and keypress["Shift"] == true then -- remove the shift condition is two buttons are annoying
+if state == false and keypress["minus"] == true and keypress["Shift"] == true then
     --if memory.read_u32_le(AD4) == 0x80000000 then
     --    memory.write_u32_le(AD4,0)
     --end
@@ -1343,6 +1383,7 @@ if overlaystate == false and keypress["O"]==true and keypress["Shift"]==true and
     overlay = false
     overlaystate = true
     print("Overlay disabled")
+    gui.clearGraphics()
 end
 if overlaystate == true and keypress["O"]==nil then
     overlaystate = false
