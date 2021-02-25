@@ -116,8 +116,8 @@ local CurrentGoals = {{0,0},{0,0},{0,0},{0,0},{0,0}}
 
 local StatusMenuOpen = false
 
-local tile = memory.read_u32_le(0x020301B8)
-local tile_value = memory.read_u16_le(tile)
+tile = memory.read_u32_le(0x020301B8)
+tile_value = memory.read_u16_le(tile)
 
 local RNmultipliers = {0x41C64E6D}
 local RNintervals = {0x3039}
