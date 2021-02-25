@@ -116,9 +116,6 @@ local CurrentGoals = {{0,0},{0,0},{0,0},{0,0},{0,0}}
 
 local StatusMenuOpen = false
 
-tile = memory.read_u32_le(0x020301B8)
-tile_value = memory.read_u16_le(tile)
-
 local RNmultipliers = {0x41C64E6D}
 local RNintervals = {0x3039}
 
@@ -407,6 +404,8 @@ end
     
     --show our X,Y coordinates while not in combat or the overworld
 if memory.read_u16_le(0x02000400)~=0x1FE and memory.read_u16_le(0x02000400)~=0x02 then
+    local tile = memory.read_u32_le(0x020301B8)
+    local tile_value = memory.read_u16_le(tile)
 gui.scaledtext(80,20,"Tile Address: 0x".. string.format("%x",tile))
 gui.scaledtext(120,0,"X: " .. string.format("%.6f",(memory.read_u32_le(0x02030ec4)/1000000)))
 gui.scaledtext(120,10,"Y: " .. string.format("%.6f",(memory.read_u32_le(0x02030ecc)/1000000)))
@@ -1391,6 +1390,9 @@ if overlaystate == true and keypress["O"]==nil then
     overlaystate = false
 end
 if overlay == true and infight == false then
+
+    local tile = memory.read_u32_le(0x020301B8)
+    local tile_value = memory.read_u16_le(tile)
 
     function compress(S)
         R = bit.rshift(memory.read_u32_le(S),16)
