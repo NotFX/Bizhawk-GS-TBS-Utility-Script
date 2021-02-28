@@ -835,8 +835,7 @@ local    mil= memory.read_u8(0x020008F3)
 if (memory.read_u8(0x020309a0)) >= 1 then
 
     function is_alive(F)
-        local CurrentHP = memory.read_u16_le(0x02000538 + 0x14C * F)
-        if CurrentHP > 0 then return true else return false end
+        return memory.read_u16_le(0x02000538 + 0x14C * F) > 0
     end
     
     function get_level(F)
@@ -845,14 +844,13 @@ if (memory.read_u8(0x020309a0)) >= 1 then
 
     function is_member(F)
         local party_flags = memory.read_u8(0x02000040)
-        check = bit.band(party_flags, 2^F)
-        if check then return true else return false end
+        return bit.band(party_flags, 2^F) > 0
     end
 
     function filter(array, callback)
         local out = {}
         for k,v in pairs(array) do
-            if callback(v) then out[k] = v end
+            if callback(v) then table.insert(out, v) end
         end
         return out
     end
@@ -873,7 +871,7 @@ if (memory.read_u8(0x020309a0)) >= 1 then
         return out
     end
 
-    party = filter({0, 1, 2, 3}, is_member) -- what is our current party
+    party = filter({0, 1, 2, 3, 4, 5, 6, 7}, is_member) -- what is our current party
     live_party = filter(party, is_alive)    -- check living members
     levels = map(live_party, get_level)     -- check living member levels
 
