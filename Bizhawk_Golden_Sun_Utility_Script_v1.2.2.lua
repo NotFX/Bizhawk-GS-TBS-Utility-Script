@@ -407,8 +407,8 @@ if memory.read_u16_le(0x02000400)~=0x1FE and memory.read_u16_le(0x02000400)~=0x0
     local tile = memory.read_u32_le(0x020301B8)
     local tile_value = memory.read_u16_le(tile)
 gui.scaledtext(80,20,"Tile Address: 0x".. string.format("%x",tile))
-gui.scaledtext(120,0,"X: " .. string.format("%.6f",(memory.read_u32_le(0x02030ec4)/1000000)))
-gui.scaledtext(120,10,"Y: " .. string.format("%.6f",(memory.read_u32_le(0x02030ecc)/1000000)))
+gui.scaledtext(120,0,"X: " .. string.format("%.6f",(memory.read_u32_le(0x02030ec4)/0x0100000)))
+gui.scaledtext(120,10,"Y: " .. string.format("%.6f",(memory.read_u32_le(0x02030ecc)/0x100000)))
 end
 
     --find nonzero
