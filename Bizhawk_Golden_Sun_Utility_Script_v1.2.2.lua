@@ -1,5 +1,6 @@
 function unpack_decorator(f) -- redefine unpack to include 0th key in arrays
     local function inner(array)
+        if array == nil then return end
         if array[0] ~= nil then
             return array[0], f(array)
         else
@@ -66,6 +67,8 @@ local nosqstate = false
 local debugmode = false
 local debugmodestate = false
 
+local DialID
+
 local BRN_temp = 0
 local BRN_temps = 0
 local BRN_tempss = 0
@@ -101,8 +104,8 @@ local CurrentName = ""
 local CharEXP = 0
 local IsaacLevels = {0,24,67,144,283,519,873,1369,2039,2910,3999,5306,6861,8696,10843,13334,16224,19548,23371,27767,32778,38491,45004,52429,60893,70457}--26 levels
 local GaretLevels = {0,30,84,176,332,582,957,1482,2191,3113,4265,5647,7292,9233,11504,14138,17193,20706,24746,29271,34339,40015,46372,53492,61894,71808}
-local IvanLevels = {0,32,90,194,350,568,895,1418,2150,3102,4292,5720,7419,9424,11770,14491,17647,21276,25449,30248,35719,41956,49066,57171,66411,76852}
-local MiaLevels = {0,31,87,188,350,609,997,1540,2273,3226,4341,5657,7197,8999,11107,13594,16529,19992,24078,28899,34395,40660,47802,55944,65226,75715}
+local IvanLevels =  {0,32,90,194,350,568,895,1418,2150,3102,4292,5720,7419,9424,11770,14491,17647,21276,25449,30248,35719,41956,49066,57171,66411,76852}
+local MiaLevels =   {0,31,87,188,350,609,997,1540,2273,3226,4341,5657,7197,8999,11107,13594,16529,19992,24078,28899,34395,40660,47802,55944,65226,75715}
 local levelstore = 1
 local statstate = false
 local StatColor = {0xFF00FF00,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF}
@@ -385,6 +388,7 @@ keypress = input.get()
 gui.scaledtext(0,0,"Frame:"..(emu.framecount()),nil,"bottomleft")
 gui.scaledtext(180,0,"BRN: ".. (memory.read_u32_le(AD4)))
 gui.scaledtext(180,10,"GRN: ".. (memory.read_u32_le(AD5)))
+--gui.scaledtext(0,80,"Dialogue ID:".. (memory.read_u16_le(0x020301D8)))
 
 if minorhudlock==false then
 if mem <= 0x2008000 then
@@ -1029,7 +1033,7 @@ if (memory.read_u8(0x020309a0)) >= 1 then
             -- begin BRN calculations for procs
         if nosq == false then    -- normal any% probabilities follow from here
 
-            if  BladeUser ~= nil then    -- if someone has ABlade
+            if BladeUser ~= nil then    -- if someone has ABlade
                 BRN = memory.read_u32_le(0x020023A8)
                 bcount=0
                 
@@ -1091,7 +1095,7 @@ if (memory.read_u8(0x020309a0)) >= 1 then
                 table.insert(battle_display, {160,70,"Mist: " .. bcount})
             end
                                                                             
-            if ScorchUser ~= nil and memory.read_u8(0x0200016C)~=0x80 then    
+            if ScorchUser ~= nil then    
                 BRN = memory.read_u32_le(0x020023A8)
                 bcount=0
                 
@@ -1370,12 +1374,14 @@ if encounterstate == true and keypress["E"]==nil then
 end
 if encounterlock == true then
     memory.write_u16_le(AD3,0x1)
+    memory.write_u16_le(0x020301B5,0x1)
 end
 -- This code is for the map data overlay
 
 if overlaystate == false and keypress["O"]==true and keypress["Shift"]==true and overlay == false then
     overlay = true
     overlaystate = true
+    gui.clearGraphics()
     print("Overlay enabled")
 end
 if overlaystate == false and keypress["O"]==true and keypress["Shift"]==true and overlay == true then
@@ -1386,6 +1392,7 @@ if overlaystate == false and keypress["O"]==true and keypress["Shift"]==true and
 end
 if overlaystate == true and keypress["O"]==nil then
     overlaystate = false
+    gui.clearGraphics()
 end
 if overlay == true and infight == false then
 
@@ -1575,9 +1582,11 @@ if debugmodestate == true and keypress["U"]==nil then
     debugmodestate = false
 end
 if debugmode == true then
-  memory.write_u8(0x03001F54,1)
+  memory.write_u8(0x03001F54,1) 
+  memory.write_u8(0x03001F64,1)
 else
   memory.write_u8(0x03001F54,0)
+  memory.write_u8(0x03001F64,0)
 end
 
 --- no s&q probabilities
@@ -1874,6 +1883,7 @@ if MapDataCheck == true and bit.band(bit.rshift(memory.readbyte(0x02000060),3),1
   end
 end
 
+
 local EncounterDataState
 if EncounterDataCheck == true then -- if EncounterData plugin is installed
   if keypress["Ctrl"] == true and keypress["E"] == true and prevkeypress["E"] ~= true then
@@ -1888,5 +1898,6 @@ end
 
 end
     prevkeypress = input.get()
+    --gui.clearGraphics()
     emu.frameadvance();
 end
