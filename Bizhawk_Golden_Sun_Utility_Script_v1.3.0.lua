@@ -9,7 +9,7 @@ function unpack_decorator(f) -- redefine unpack to include 0th key in arrays
     end
     return inner
 end
-unpack = unpack_decorator(unpack)
+table.unpack = unpack_decorator(table.unpack)
 
 local version = (memory.read_u8(0x080000A0) == 0x4F) and "J" or "U" -- check version and set global
     JPN = nil
@@ -148,7 +148,7 @@ function PluginDetect(arg) -- detect which plugin scripts are installed
       else table.insert(out, false)
       end
     end
-    return unpack(out)
+    return table.unpack(out)
 end
 
 function gui.scaledtext (x, y, ...)  -- scales gui elements to emulator screen ratio
@@ -156,7 +156,7 @@ function gui.scaledtext (x, y, ...)  -- scales gui elements to emulator screen r
     local borderY = client.borderheight()
     local width = client.screenwidth() - 2*borderX
     local height = client.screenheight() - 2*borderY
-    gui.text(x/240 * width + borderX, y/160 * height + borderY, unpack(arg))
+    gui.text(x/240 * width + borderX, y/160 * height + borderY, table.unpack(arg))
 end
 
 function LevelCalculator(CurrentCharacter)
@@ -1085,7 +1085,7 @@ if (memory.read_u8(0x020309a0)) >= 1 then
                 BRN = memory.read_u32_le(0x020023A8)                            -- have Mist and before Colloso ends
                 bcount=0
                 
-                if eres[1] == math.min(unpack(eres)) then BRN = RNA(BRN) end
+                if eres[1] == math.min(table.unpack(eres)) then BRN = RNA(BRN) end
 
                     while effectproc(BRN,24,1,MistUser) == false do
                         bcount = bcount+1
@@ -1099,7 +1099,7 @@ if (memory.read_u8(0x020309a0)) >= 1 then
                 BRN = memory.read_u32_le(0x020023A8)
                 bcount=0
                 
-                if eres[2] == math.min(unpack(eres)) then BRN = RNA(BRN) end
+                if eres[2] == math.min(table.unpack(eres)) then BRN = RNA(BRN) end
 
                     while effectproc(BRN,23,2,ScorchUser) == false do
                         bcount = bcount+1
@@ -1210,7 +1210,7 @@ if (memory.read_u8(0x020309a0)) >= 1 then
     end
 
     for i=1,#battle_display do
-        gui.scaledtext(unpack(battle_display[i]))
+        gui.scaledtext(table.unpack(battle_display[i]))
     end
 
 
