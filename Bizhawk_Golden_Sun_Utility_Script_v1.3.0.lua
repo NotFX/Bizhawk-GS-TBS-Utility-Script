@@ -156,7 +156,7 @@ function gui.scaledtext (x, y, ...)  -- scales gui elements to emulator screen r
     local borderY = client.borderheight()
     local width = client.screenwidth() - 2*borderX
     local height = client.screenheight() - 2*borderY
-    gui.text(x/240 * width + borderX, y/160 * height + borderY, table.unpack(arg))
+    gui.text(x/240 * width + borderX, y/160 * height + borderY, ...)
 end
 
 function LevelCalculator(CurrentCharacter)
