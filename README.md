@@ -1,5 +1,7 @@
 # Bizhawk-GS-TBS-Utility-Scripts
 The scripts we've gotten used to on VBA, but for Bizhawk's mGBA core instead.
+Note: V1.3 and up is written for Bizhawk 2.9
+      V1.2 is for Bizhawk 2.6
 
 
 How to use: 
