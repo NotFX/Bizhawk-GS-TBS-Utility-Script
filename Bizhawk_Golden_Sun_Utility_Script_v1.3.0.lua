@@ -124,7 +124,7 @@ local RNintervals = {0x3039}
 
 function multMod (A,B,C) -- Multiplies big numbers, and takes mod 2^32
   local a1 = (A >> 16)
-  local a2 = (A >> 0xFFFF)
+  local a2 = (A & 0xFFFF)
   local b1 = (B >> 16)
   local b2 = (B & 0xFFFF)
   local p = ((((a1*b2 + a2*b1) << 16) + a2*b2 + C) & -1)
