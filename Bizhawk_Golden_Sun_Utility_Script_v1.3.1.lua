@@ -123,13 +123,7 @@ local RNmultipliers = {0x41C64E6D}
 local RNintervals = {0x3039}
 
 function multMod (A,B,C) -- Multiplies big numbers, and takes mod 2^32
-  local a1 = (A >> 16)
-  local a2 = (A & 0xFFFF)
-  local b1 = (B >> 16)
-  local b2 = (B & 0xFFFF)
-  local p = ((((a1*b2 + a2*b1) << 16) + a2*b2 + C) & -1)
-  if p<0 then return p + 2^32 
-  else return p end
+    return (A*B+C) & 0xFFFFFFFF
 end
 
 for i=1,31 do -- Constructs the effective multipliers and increments for each power of 2
