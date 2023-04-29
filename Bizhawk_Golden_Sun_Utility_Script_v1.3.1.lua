@@ -308,7 +308,7 @@ function RNA (R, advances) -- RN Advance Function
     if advances == nil then 
         return multMod(R, RNmultipliers[1], RNintervals[1])
     else
-        advances = (advances & -1)
+        advances = (advances & 0xFFFFFFFF)
         for i=1,32 do
             if (advances & 1)==1 then
             R = multMod(R, RNmultipliers[i], RNintervals[i])
