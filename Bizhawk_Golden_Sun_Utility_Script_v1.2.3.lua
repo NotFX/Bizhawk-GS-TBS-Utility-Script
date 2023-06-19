@@ -374,8 +374,8 @@ BattleState = nil -- Encounter detection
 local MapDataCheck, EncounterDataCheck = PluginDetect({"MapData.lua","EncounterData.lua"}) -- check plugin installations
 
 if MapDataCheck == true then -- if plugin is installed
-    print("MapData plugin detected.\n Shift+D to save data.")
-    require("MapData")
+    print("MapData_1.2 plugin detected.\n Shift+D to save data.")
+    require("MapData_1.2")
 end
 if EncounterDataCheck == true then
     print("EncounterData plugin detected.\n Ctrl+E to display.")
